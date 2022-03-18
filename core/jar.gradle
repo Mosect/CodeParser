@@ -1,0 +1,105 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+import java.text.SimpleDateFormat
+
+apply plugin: 'java-library'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+def jarData = null
+file('jar.json').withReader('utf-8', {
+    JsonSlurper jsonSlurper = new JsonSlurper()
+    jarData = jsonSlurper.parse(it)
+})
+
+def appName = jarData.appName
+def appVersion = jarData.appVersion
+def appType = jarData.appType
+def appId = jarData.appId
+def appAuthor = jarData.appAuthor
+
+def tempJavaDir = new File(buildDir, 'generated/java/main')
+def tempResDir = new File(buildDir, 'generated/res/main')
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': appName,
+                'Implementation-Version': appVersion,
+                'Main-Class': "${appId}.Main"
+    }
+}
+
+task generateJava {
+    outputs.dir(tempJavaDir)
+    doLast {
+        tempJavaDir.deleteDir()
+        tempJavaDir.mkdirs()
+        File javaFile = new File(tempJavaDir, "${appId.replace('.', '/')}/BuildConfig.java")
+        File dir = javaFile.parentFile
+        if (!dir.exists()) dir.mkdirs()
+        javaFile.text = "package ${appId};\n" +
+                'public class BuildConfig {\n' +
+                "\tpublic final static String NAME = \"${appName}\";\n" +
+                "\tpublic final static String VERSION = \"${appVersion}\";\n" +
+                "\tpublic final static String TYPE = \"${appType}\";\n" +
+                "\tpublic final static String APP_ID = \"${appId}\";\n" +
+                "\tpublic final static String AUTHOR = \"${appAuthor}\";\n" +
+                '}\n'
+    }
+}
+
+task generateRes {
+    outputs.dir(tempResDir)
+    doLast {
+        tempResDir.deleteDir()
+        tempResDir.mkdirs()
+        // 生成manifest.json
+        File manifestFile = new File(tempResDir, 'manifest.json')
+        def buildId = UUID.randomUUID().toString()
+        def creTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+        def json = JsonOutput.toJson([
+                scriptType    : 'build-tool',
+                version       : appVersion,
+                buildId       : buildId,
+                creTime       : creTime,
+                appName       : appName,
+                appId         : appId,
+                appVersion    : appVersion,
+                appType       : appType,
+                appAuthor     : appAuthor
+        ])
+        manifestFile.setText(JsonOutput.prettyPrint(json), 'utf-8')
+    }
+}
+
+compileJava {
+    dependsOn(generateJava)
+    dependsOn(generateRes)
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir(tempJavaDir)
+        }
+        resources {
+            srcDir(tempResDir)
+        }
+    }
+}
+
+shadowJar {
+    baseName(appName)
+    classifier(appType)
+    version(appVersion)
+    include {
+        'com.google.code.gson:gson:2.8.6'
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"

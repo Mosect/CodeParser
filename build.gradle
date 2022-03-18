@@ -1,0 +1,17 @@
+buildscript {
+    repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/public'
+        }
+        mavenCentral()
+        google()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+    }
+}
+
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
