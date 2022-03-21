@@ -26,24 +26,15 @@ public class LinefeedNodeFactory implements NodeFactory {
 
     @Override
     public Node parse(ParentParser parentParser, TextSource source, List<ParseError> outErrors) throws ParseException {
-        CharSequence text = source.getText();
-        int pos = source.getPosition();
-        char first = text.charAt(pos);
-        if (first == '\r') {
-            int nextPos = pos + 1;
-            if (nextPos < text.length()) {
-                char next = text.charAt(nextPos);
-                if (next == '\n') {
-                    // \r\n
-                    source.setPosition(pos + 2);
-                    return CRLF;
-                }
-            }
-            source.setPosition(pos + 1);
-            return CR;
-        } else if (first == '\n') {
-            source.setPosition(pos + 1);
-            return LF;
+        if (source.match("\r\n")) {
+            source.offset(2);
+            return crlf();
+        } else if (source.match("\r")) {
+            source.offsetOne();
+            return cr();
+        } else if (source.match("\n")) {
+            source.offsetOne();
+            return lf();
         }
         return null;
     }

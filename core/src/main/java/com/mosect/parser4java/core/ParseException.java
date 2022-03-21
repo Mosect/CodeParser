@@ -9,8 +9,7 @@ public class ParseException extends Exception {
     private final int position;
 
     public ParseException(String errorId, int position) {
-        this.errorId = errorId;
-        this.position = position;
+        this(String.format("errorId=%s,position=%s", errorId, position), errorId, position);
     }
 
     public ParseException(String message, String errorId, int position) {

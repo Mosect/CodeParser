@@ -42,26 +42,17 @@ public class CommentNodeFactory implements NodeFactory {
             int end = -1;
             CharSequence text = source.getText();
             int pos = source.getPosition();
-            boolean star = false;
-            for (int i = pos + 2; i < text.length(); i++) {
-                char ch = text.charAt(pos);
-                if (star) {
-                    if (ch == '/') {
-                        // 多行注释结束
-                        end = pos + 1;
-                        break;
-                    }
-                    if (ch != '*') {
-                        star = false;
-                    }
-                } else {
-                    if (ch == '*') {
-                        star = true;
-                    }
+            int offset = 2;
+            while (pos + offset < text.length()) {
+                if (source.match(offset, "*/")) {
+                    end = pos + offset + 2;
+                    break;
                 }
+                ++offset;
             }
             if (end >= 0) {
                 String tokenText = text.subSequence(pos, end).toString();
+                source.setPosition(end);
                 return new CommonToken("", "multiple", "comment", tokenText);
             }
             throw new ParseException("COMMENT_MISSING_END", text.length());

@@ -1,1 +1,1 @@
-apply from: file('jar.gradle')
+apply from: rootProject.file('jar.gradle')

@@ -1,6 +1,5 @@
 package com.mosect.parser4java.core.javalike;
 
-import com.mosect.parser4java.core.Node;
 import com.mosect.parser4java.core.NodeFactory;
 import com.mosect.parser4java.core.ParentParser;
 import com.mosect.parser4java.core.ParseError;
@@ -30,7 +29,9 @@ public class StringNodeFactory implements NodeFactory {
     }
 
     @Override
-    public Node parse(ParentParser parentParser, TextSource source, List<ParseError> outErrors) throws ParseException {
+    public StringToken parse(ParentParser parentParser, TextSource source, List<ParseError> outErrors) throws ParseException {
+        if (!source.hasMore()) return null;
+
         int pos = source.getPosition();
         CharSequence text = source.getText();
         char first = text.charAt(pos);
@@ -72,6 +73,7 @@ public class StringNodeFactory implements NodeFactory {
                 throw new ParseException("MISSING_STRING_END", offset);
             }
             String str = text.subSequence(pos, end).toString();
+            source.offset(str.length());
             return createStringToken("", str, tempStringBuilder.toString());
         }
 

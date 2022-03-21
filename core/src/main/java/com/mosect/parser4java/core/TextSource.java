@@ -15,6 +15,14 @@ public abstract class TextSource {
         this.position = Math.max(position, 0);
     }
 
+    public void offset(int value) {
+        position += value;
+    }
+
+    public void offsetOne() {
+        ++position;
+    }
+
     public int getPosition() {
         return position;
     }
@@ -39,12 +47,14 @@ public abstract class TextSource {
         CharSequence text = getText();
         int lineNumber = 0;
         int lineOffset = 0;
+        int linePosition = 0;
         boolean _r = false;
         for (int charOffset = 0; charOffset < text.length() && curIndex < errors.size(); charOffset++) {
             char ch = text.charAt(charOffset);
             if (ch == '\r') {
                 // \r换行
                 ++lineNumber;
+                linePosition = charOffset + 1;
                 lineOffset = 0;
                 _r = true;
             } else if (ch == '\n') {
@@ -52,10 +62,12 @@ public abstract class TextSource {
                 if (!_r) {
                     // \n
                     ++lineNumber;
+                    linePosition = charOffset + 1;
                     lineOffset = 0;
                 } else {
                     // \r\n 忽略，无需增加lineNumber
                     _r = false;
+                    ++linePosition;
                 }
             } else {
                 if (_r) _r = false;
@@ -63,14 +75,16 @@ public abstract class TextSource {
             }
 
             if (charOffset == curPos) {
-                for (int errorIndex = 0; errorIndex < safeErrors.size(); errorIndex++) {
-                    curIndex = errorIndex;
+                for (int errorIndex = curIndex; errorIndex < safeErrors.size(); errorIndex++) {
                     ParseError error = safeErrors.get(errorIndex);
                     if (error.getPosition() == charOffset) {
                         error.setLineOffset(lineOffset);
                         error.setLineNumber(lineNumber);
+                        error.setLinePosition(linePosition);
+                        curIndex = errorIndex + 1;
                     } else {
                         curPos = error.getPosition();
+                        curIndex = errorIndex;
                         break;
                     }
                 }
@@ -80,6 +94,7 @@ public abstract class TextSource {
             ParseError error = safeErrors.get(i);
             error.setLineNumber(lineNumber);
             error.setLineOffset(lineOffset);
+            error.setLinePosition(linePosition);
         }
     }
 
@@ -115,10 +130,38 @@ public abstract class TextSource {
      * @return true，已匹配；false，无法匹配
      */
     public boolean match(String str) {
-        int count = hasCount();
+        return match(0, str);
+    }
+
+    public int length() {
+        return getText().length();
+    }
+
+    public String splitLine(int position) {
+        CharSequence text = getText();
+        int end = text.length();
+        for (int i = position; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (ch == '\r' || ch == '\n') {
+                end = i;
+                break;
+            }
+        }
+        if (end > position) {
+            return text.subSequence(position, end).toString();
+        }
+        return "";
+    }
+
+    public boolean match(int offset, String str) {
+        CharSequence text = getText();
+        int pos = Math.max(getPosition() + offset, 0);
+        int count = text.length() - pos;
         if (count >= str.length()) {
-            CharSequence text = getText();
-            int pos = getPosition();
+            if (str.length() == 1) {
+                return getText().charAt(getPosition() + offset) == str.charAt(0);
+            }
+
             for (int i = 0; i < str.length(); i++) {
                 char strChar = str.charAt(i);
                 char textChar = text.charAt(pos + i);

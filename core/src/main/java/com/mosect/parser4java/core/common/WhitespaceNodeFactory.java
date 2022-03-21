@@ -8,12 +8,38 @@ import com.mosect.parser4java.core.ParseException;
 import com.mosect.parser4java.core.TextSource;
 import com.mosect.parser4java.core.Token;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 空白字符节点解析器
  */
 public class WhitespaceNodeFactory implements NodeFactory {
+
+    public final static Token SPACE = new CommonToken("space", "space", "whitespace", " ");
+    public final static Token TAB = new CommonToken("tab", "tab", "whitespace", "\t");
+
+    private final Map<String, Token> tokenMap = new HashMap<>();
+
+    public WhitespaceNodeFactory() {
+        register(SPACE);
+        register(TAB);
+    }
+
+    public Token register(String name, String text) {
+        CommonToken token = new CommonToken(name, name, "whitespace", text);
+        tokenMap.put(token.getId(), token);
+        return token;
+    }
+
+    public void register(Token token) {
+        tokenMap.put(token.getId(), token);
+    }
+
+    public Token unregister(String id) {
+        return tokenMap.remove(id);
+    }
 
     @Override
     public String getName() {
@@ -22,58 +48,12 @@ public class WhitespaceNodeFactory implements NodeFactory {
 
     @Override
     public Node parse(ParentParser parentParser, TextSource source, List<ParseError> outErrors) throws ParseException {
-        int pos = source.getPosition();
-        CharSequence text = source.getText();
-        char first = text.charAt(pos);
-        if (isWhitespaceChar(first)) {
-            int end = text.length();
-            for (int i = pos + 1; i < text.length(); i++) {
-                char ch = text.charAt(i);
-                if (!isWhitespaceChar(ch)) {
-                    end = i;
-                    break;
-                }
+        for (Token token : tokenMap.values()) {
+            if (source.match(token.getText())) {
+                source.offset(token.getText().length());
+                return token;
             }
-            String tokenText = text.subSequence(pos, end).toString();
-            source.setPosition(end);
-            return new CommonToken("", "", "whitespace", tokenText);
         }
         return null;
-    }
-
-    /**
-     * 创建空白字符节点
-     *
-     * @param whitespaceText 空白字符串
-     * @return 空白字符节点
-     */
-    public Token create(String whitespaceText) {
-        if (whitespaceText.length() > 0) {
-            for (int i = 0; i < whitespaceText.length(); i++) {
-                char ch = whitespaceText.charAt(i);
-                if (!isWhitespaceChar(ch)) {
-                    throw new IllegalArgumentException("Invalid whitespace text");
-                }
-            }
-            return new CommonToken("", "", "whitespace", whitespaceText);
-        } else {
-            throw new IllegalArgumentException("Empty whitespace text");
-        }
-    }
-
-    /**
-     * 判断是否为空白字符
-     *
-     * @param ch 字符
-     * @return true，为空白字符；false，非空白字符
-     */
-    public boolean isWhitespaceChar(char ch) {
-        switch (ch) {
-            case '\t':
-            case ' ':
-                return true;
-            default:
-                return false;
-        }
     }
 }

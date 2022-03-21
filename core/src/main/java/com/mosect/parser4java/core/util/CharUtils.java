@@ -19,4 +19,8 @@ public final class CharUtils {
     public static boolean isOctChar(char ch) {
         return ch >= '0' && ch <= '7';
     }
+
+    public static boolean isBinChar(char ch) {
+        return ch == '0' || ch == '1';
+    }
 }

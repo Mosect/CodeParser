@@ -10,6 +10,7 @@ public class ParseError {
     private final int position;
     private int lineNumber;
     private int lineOffset;
+    private int linePosition;
 
     public ParseError(String id, String text, int position) {
         this.id = id;
@@ -21,6 +22,7 @@ public class ParseError {
         this(other.getId(), other.getText(), other.getPosition());
         setLineNumber(other.getLineNumber());
         setLineOffset(other.getLineOffset());
+        setLinePosition(other.getLinePosition());
     }
 
     public String getId() {
@@ -51,6 +53,14 @@ public class ParseError {
         this.lineOffset = lineOffset;
     }
 
+    public int getLinePosition() {
+        return linePosition;
+    }
+
+    public void setLinePosition(int linePosition) {
+        this.linePosition = linePosition;
+    }
+
     @Override
     public String toString() {
         return "ParseError{" +
@@ -59,6 +69,7 @@ public class ParseError {
                 ", position=" + position +
                 ", lineNumber=" + lineNumber +
                 ", lineOffset=" + lineOffset +
+                ", linePosition=" + linePosition +
                 '}';
     }
 }

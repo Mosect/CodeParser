@@ -1,6 +1,5 @@
 package com.mosect.parser4java.core.javalike;
 
-import com.mosect.parser4java.core.Node;
 import com.mosect.parser4java.core.NodeFactory;
 import com.mosect.parser4java.core.ParentParser;
 import com.mosect.parser4java.core.ParseError;
@@ -23,7 +22,9 @@ public class CharNodeFactory implements NodeFactory {
     }
 
     @Override
-    public Node parse(ParentParser parentParser, TextSource source, List<ParseError> outErrors) throws ParseException {
+    public CharToken parse(ParentParser parentParser, TextSource source, List<ParseError> outErrors) throws ParseException {
+        if (!source.hasMore()) return null;
+
         CharSequence text = source.getText();
         int pos = source.getPosition();
         char first = text.charAt(pos);
@@ -52,6 +53,7 @@ public class CharNodeFactory implements NodeFactory {
                                 throw new ParseException("MISSING_CHAR_END", out.end);
                             }
                             String str = text.subSequence(pos, end).toString();
+                            source.offset(str.length());
                             return createCharToken("", str, out.type, out.value);
                         } else {
                             throw new ParseException("INVALID_CHAR", out.end);
@@ -112,7 +114,7 @@ public class CharNodeFactory implements NodeFactory {
                     if (ech == 0) {
                         // 无法转义字符
                         switch (ch) {
-                            case 'u': // \u
+                            case 'u': // \\u
                                 mode = 2;
                                 break;
                             case '0': // \0
@@ -122,6 +124,7 @@ public class CharNodeFactory implements NodeFactory {
                                 if (CharUtils.isOctChar(ch)) {
                                     // 8进制
                                     mode = 4;
+                                    size = 1;
                                 } else {
                                     out.end = i;
                                     state = 2; // 错误
@@ -138,7 +141,7 @@ public class CharNodeFactory implements NodeFactory {
                         return true;
                     }
                     break;
-                case 2: // \u
+                case 2: // \\u
                     if (CharUtils.isHexChar(ch)) {
                         // 合法16进制
                         if (++size == 4) {
@@ -147,7 +150,7 @@ public class CharNodeFactory implements NodeFactory {
                             out.end = i + 1;
                             out.type = CharType.HEX;
                             out.text = text;
-                            String str = text.subSequence(offset + 1, offset + 5).toString();
+                            String str = text.subSequence(offset + 2, offset + 6).toString();
                             out.value = (char) Integer.parseInt(str, 16);
                             return true;
                         }

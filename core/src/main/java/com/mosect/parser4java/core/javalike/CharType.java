@@ -17,7 +17,7 @@ public enum CharType {
      */
     ZERO,
     /**
-     * u码16进制，\uxxxx格式
+     * u码16进制，\\uxxxx格式
      */
     HEX,
     /**
