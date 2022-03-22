@@ -48,20 +48,28 @@ public class JavaTest {
     @Test
     public void testJavaFile() throws Exception {
         changeOutput();
-        File file = new File("D:\\Work\\Temp\\java_src\\src\\java.net.http\\java\\net\\http\\HttpClient.java");
+        File file = new File("D:\\Work\\Temp\\java_src\\src\\java.net.http\\java\\net\\http\\HttpHeaders.java");
         JavaFactory javaFactory = new JavaFactory();
         parseJavaFile(javaFactory, file);
     }
 
     @Test
+    public void testJavaParser() throws Exception {
+        changeOutput();
+        File file = new File("D:\\Work\\Temp\\java_src\\src\\java.net.http\\java\\net\\http\\HttpClient.java");
+        JavaParser javaParser = new JavaParser();
+        parseJava(javaParser, file);
+    }
+
+    @Test
     public void testParser() throws Exception {
         changeOutput();
-        File file = new File("D:\\Work\\Temp\\java_src\\src");
+        File file = new File("D:\\Work\\Temp\\java_src\\src\\java.base");
         List<File> list = new ArrayList<>();
         listJavaFiles(file, list);
-        JavaFactory javaFactory = new JavaFactory();
+        JavaParser javaParser = new JavaParser();
         for (File javaFile : list) {
-            parseJavaFile(javaFactory, javaFile);
+            parseJava(javaParser, javaFile);
         }
     }
 
@@ -79,6 +87,14 @@ public class JavaTest {
                 throw new IllegalStateException("InvalidJavaFile: " + javaFile);
             }
             printNode(node, source);
+        }
+    }
+
+    private void parseJava(JavaParser javaParser, File javaFile) throws Exception {
+        out.println("parseJava: " + javaFile);
+        try (FileInputStream fis = new FileInputStream(javaFile)) {
+            InputStreamSource source = new InputStreamSource(fis, "UTF-8");
+            javaParser.parse(source, 0);
         }
     }
 
