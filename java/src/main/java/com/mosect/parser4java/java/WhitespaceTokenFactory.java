@@ -1,0 +1,42 @@
+package com.mosect.parser4java.java;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class WhitespaceTokenFactory {
+
+    private final Map<String, WhitespaceToken> tokenMap = new HashMap<>();
+    private final Map<String, WhitespaceToken> tokenNameMap = new HashMap<>();
+
+    public WhitespaceTokenFactory() {
+        register("\r\n", "crlf");
+        register("\r", "cr");
+        register("\n", "lf");
+        register("\t", "tab");
+        register(" ", "space");
+    }
+
+    protected void register(WhitespaceToken token) {
+        tokenMap.put(token.getText(), token);
+        tokenNameMap.put(token.getCharName(), token);
+    }
+
+    protected void register(String text, String charName) {
+        register(new WhitespaceToken("java.whitespace", text, charName));
+    }
+
+    protected void unregister(String text) {
+        WhitespaceToken token = tokenMap.remove(text);
+        if (null != token) {
+            tokenNameMap.remove(token.getCharName());
+        }
+    }
+
+    public WhitespaceToken createTokenByText(String text) {
+        return tokenMap.get(text);
+    }
+
+    public WhitespaceToken createTokenByName(String charName) {
+        return tokenNameMap.get(charName);
+    }
+}

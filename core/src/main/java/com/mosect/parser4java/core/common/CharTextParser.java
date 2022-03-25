@@ -191,7 +191,7 @@ public class CharTextParser extends CommonTextParser {
 
     @Override
     public String getName() {
-        return "javalike.char";
+        return "common.char";
     }
 
     /**

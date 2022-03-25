@@ -54,6 +54,13 @@ public class CommentParser extends CommonTextParser {
         }
     }
 
+    /**
+     * 获取注释名称<br>
+     * 单行：single<br>
+     * 多行：multi<br>
+     *
+     * @return 注释名称
+     */
     public String getCommentName() {
         return commentName;
     }
