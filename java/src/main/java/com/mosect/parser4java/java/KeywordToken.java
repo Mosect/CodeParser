@@ -27,7 +27,7 @@ public class KeywordToken extends CommonToken {
     }
 
     public boolean isBaseType() {
-        return data.baseType;
+        return data.primitive;
     }
 
     public boolean isInstructed() {
@@ -40,12 +40,12 @@ public class KeywordToken extends CommonToken {
 
     public static class Data {
 
-        private boolean modifyClass;
-        private boolean modifyField;
-        private boolean modifyMethod;
-        private boolean baseType;
-        private boolean instructed;
-        private boolean definition;
+        private boolean modifyClass; // 是否可以修饰类
+        private boolean modifyField; // 是否可以修饰字段
+        private boolean modifyMethod; // 是否可以修饰方法
+        private boolean primitive; // 是否为原始类型
+        private boolean instructed; // 是否为之类
+        private boolean definition; // 是否为声明
 
         public boolean isModifyClass() {
             return modifyClass;
@@ -74,12 +74,12 @@ public class KeywordToken extends CommonToken {
             return this;
         }
 
-        public boolean isBaseType() {
-            return baseType;
+        public boolean isPrimitive() {
+            return primitive;
         }
 
-        public Data setBaseType(boolean baseType) {
-            this.baseType = baseType;
+        public Data setPrimitive(boolean primitive) {
+            this.primitive = primitive;
             return this;
         }
 

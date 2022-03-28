@@ -1,10 +1,12 @@
 package com.mosect.parser4java.java;
 
+import com.mosect.parser4java.core.ParseError;
+import com.mosect.parser4java.core.TextParseError;
 import com.mosect.parser4java.core.TextParser;
 import com.mosect.parser4java.core.TextSource;
 import com.mosect.parser4java.core.Token;
 import com.mosect.parser4java.core.common.CommonToken;
-import com.mosect.parser4java.core.util.WrapText;
+import com.mosect.parser4java.core.util.ParserSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,66 +16,47 @@ import java.util.List;
  */
 public class JavaParser {
 
-    protected final List<TextParser> parsers1 = new ArrayList<>();
-    protected final List<TextParser> parsers2 = new ArrayList<>();
+    protected ParserSet parserSet1;
+    protected ParserSet parserSet2;
 
     protected final List<Token> tokenList = new ArrayList<>(512);
 
     protected WhitespaceTokenFactory whitespaceTokenFactory = new WhitespaceTokenFactory();
 
     public JavaParser() {
-        parsers1.add(new CommentParser());
-        parsers1.add(new StringParser());
-        parsers1.add(new CharParser());
-        parsers1.add(new WhitespaceParser());
-        parsers1.add(new SymbolParser());
+        // 第一遍解析
+        parserSet1 = new ParserSet() {
+            @Override
+            protected void processParser(TextSource source, TextParser parser) {
+                JavaParser.this.processParser(source, parser);
+            }
+        };
+        parserSet1.addParser(new CommentParser());
+        parserSet1.addParser(new StringParser());
+        parserSet1.addParser(new CharParser());
+        parserSet1.addParser(new WhitespaceParser());
 
-        parsers2.add(new NameParser());
+        // 第二遍解析
+        parserSet2 = new ParserSet() {
+            @Override
+            protected void processParser(TextSource source, TextParser parser) {
+                JavaParser.this.processParser(source, parser);
+            }
+        };
+        parserSet2.addParser(new NumberParser());
+        parserSet2.addParser(new SymbolParser());
+        parserSet2.addParser(new NamedParser());
+
+        parserSet1.setChildParserSet(parserSet2);
     }
 
     public void parse(TextSource source, int start) {
         onClear();
-
-        CharSequence text = source.getText();
-        WrapText wrapText = new WrapText(text);
-        int unknownStart = start;
-        int offset = start;
-        while (offset < text.length()) {
-            TextParser validParser = null;
-            for (TextParser parser : parsers1) {
-                parser.parse(text, offset);
-                if (parser.isPass()) {
-                    validParser = parser;
-                    break;
-                }
-            }
-            if (null == validParser) {
-                ++offset;
-            } else {
-                offset = validParser.getTextEnd();
-                handleParser2(source, wrapText, unknownStart, validParser.getTextStart());
-                unknownStart = validParser.getTextEnd();
-                processParser(source, validParser);
-            }
-        }
-        handleParser2(source, wrapText, unknownStart, text.length());
+        parserSet1.parse(source, start);
     }
 
-    protected void handleParser2(TextSource source, WrapText wrapText, int unknownStart, int unknownEnd) {
-        if (unknownEnd > unknownStart) {
-            wrapText.setLength(unknownEnd);
-            for (TextParser parser : parsers2) {
-                parser.parse(wrapText, unknownStart);
-                if (parser.isPass()) {
-                    processParser(source, parser);
-                    break;
-                }
-            }
-        }
-    }
-
-    protected boolean processParser(TextSource source, TextParser parser) {
-        /*if (parser.hasError()) {
+    protected void processParser(TextSource source, TextParser parser) {
+        if (parser.hasError()) {
             List<ParseError> errors = new ArrayList<>();
             for (int i = 0; i < parser.getErrorCount(); i++) {
                 TextParseError error = parser.getError(i);
@@ -86,11 +69,26 @@ public class JavaParser {
                 System.err.println("charOffset: " + (pe.getPosition() - parser.getTextStart()));
                 System.err.println(pe);
             }
-        }*/
+            throw new IllegalStateException("Unsupported: " + parser.getParseText());
+        }
+        boolean handled = onHandleToken(source, parser);
+        if (!handled) {
+            throw new IllegalStateException("Unsupported parser: " + parser.getName());
+        }
+    }
+
+    protected boolean onHandleToken(TextSource source, TextParser parser) {
         switch (parser.getName()) {
             case "java.name":
-                NameParser nameParser = (NameParser) parser;
-                break;
+                NamedParser namedParser = (NamedParser) parser;
+                KeywordToken keywordToken = namedParser.getKeywordToken();
+                if (null != keywordToken) {
+                    tokenList.add(keywordToken);
+                } else {
+                    Token namedToken = createNamedToken(namedParser);
+                    tokenList.add(namedToken);
+                }
+                return true;
             case "java.char":
                 CharParser charParser = (CharParser) parser;
                 CharToken charToken = createCharToken(charParser);
@@ -115,6 +113,11 @@ public class JavaParser {
                 WhitespaceParser whitespaceParser = (WhitespaceParser) parser;
                 WhitespaceToken whitespaceToken = createWhitespaceToken(whitespaceParser);
                 tokenList.add(whitespaceToken);
+                return true;
+            case "java.number":
+                NumberParser numberParser = (NumberParser) parser;
+                NumberToken numberToken = createNumberToken(numberParser);
+                tokenList.add(numberToken);
                 return true;
             default:
                 return false;
@@ -144,6 +147,21 @@ public class JavaParser {
     protected WhitespaceToken createWhitespaceToken(WhitespaceParser whitespaceParser) {
         String text = whitespaceParser.getParseText().toString();
         return whitespaceTokenFactory.createTokenByText(text);
+    }
+
+    protected NumberToken createNumberToken(NumberParser numberParser) {
+        String text = numberParser.getParseText().toString();
+        return new NumberToken(
+                numberParser.getName(),
+                text,
+                numberParser.getValue(),
+                numberParser.getRadix(),
+                numberParser.isInteger()
+        );
+    }
+
+    protected Token createNamedToken(NamedParser namedParser) {
+        return new CommonToken("java.named", namedParser.getNameText());
     }
 
     protected void onClear() {

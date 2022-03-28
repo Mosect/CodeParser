@@ -4,6 +4,6 @@ public class StringParser extends com.mosect.parser4java.core.javalike.StringPar
 
     @Override
     public String getName() {
-        return "java.parser";
+        return "java.string";
     }
 }
