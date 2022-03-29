@@ -1,7 +1,9 @@
 package com.mosect.parser4java.java;
 
 import com.mosect.parser4java.core.source.InputStreamSource;
+import com.mosect.parser4java.core.util.NumberUtils;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -46,6 +48,24 @@ public class JavaTest {
         for (File javaFile : list) {
             parseJava(javaParser, javaFile);
         }
+    }
+
+    @Test
+    public void testParseHexDecimal() {
+        double dv = 0x1.23p+20;
+        Number v2 = NumberUtils.parseHexDecimalWithFull64("0x1.23p+20");
+        System.out.println(dv);
+        System.out.println(v2);
+        Assert.assertEquals(dv, v2);
+    }
+
+    @Test
+    public void testParseHexDecimal32() {
+        float fv = 0x1.23p+20f;
+        Number v2 = NumberUtils.parseHexDecimalWithFull32("0x1.23p+20");
+        System.out.println(fv);
+        System.out.println(v2);
+        Assert.assertEquals(fv, v2);
     }
 
     private void parseJava(JavaParser javaParser, File javaFile) throws Exception {

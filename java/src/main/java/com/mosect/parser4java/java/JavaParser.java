@@ -32,6 +32,7 @@ public class JavaParser {
             }
         };
         parserSet1.addParser(new CommentParser());
+        parserSet1.addParser(new TextBlockParser());
         parserSet1.addParser(new StringParser());
         parserSet1.addParser(new CharParser());
         parserSet1.addParser(new WhitespaceParser());
@@ -99,6 +100,11 @@ public class JavaParser {
                 StringToken stringToken = createStringToken(stringParser);
                 tokenList.add(stringToken);
                 return true;
+            case "java.text.block":
+                TextBlockParser textBlockParser = (TextBlockParser) parser;
+                StringToken stringToken2 = createStringToken(textBlockParser);
+                tokenList.add(stringToken2);
+                return true;
             case "java.comment":
                 CommentParser commentParser = (CommentParser) parser;
                 CommentToken commentToken = createCommentToken(commentParser);
@@ -132,6 +138,11 @@ public class JavaParser {
     protected StringToken createStringToken(StringParser stringParser) {
         String text = stringParser.getParseText().toString();
         return new StringToken(stringParser.getName(), text, stringParser.getString());
+    }
+
+    protected StringToken createStringToken(TextBlockParser textBlockParser) {
+        String text = textBlockParser.getParseText().toString();
+        return new StringToken(textBlockParser.getName(), text, textBlockParser.getString());
     }
 
     protected CommentToken createCommentToken(CommentParser commentParser) {

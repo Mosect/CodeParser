@@ -2,6 +2,7 @@ package com.mosect.parser4java.core.javalike;
 
 import com.mosect.parser4java.core.common.CommonTextParser;
 import com.mosect.parser4java.core.util.CharUtils;
+import com.mosect.parser4java.core.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -53,39 +54,43 @@ public class NumberParser extends CommonTextParser {
         if (CharUtils.match(text, start, "0x", true)) {
             setPrefix("0x");
             // 十六进制
-            int offset = start + 2;
             setRadix(16);
             name = "NUMBER_HEX";
 
+            int intStart = start + 2; // 整数开始位置
+            // 解析整数部分
+            end = parseNumber(name, text, intStart, getHexCharHandler());
+            int intEnd = end; // 整数结束位置
+            int pointEnd = intEnd; // 点结束位置
+            int mantissaEnd = intEnd; // 尾数结束部分
             if (CharUtils.match(text, end, ".", false)) {
-                // 0x.123
+                // 包含点，十六进制小数
+                numberBuilder.append('.');
                 name = "NUMBER_DEC_HEX";
                 setInteger(false);
-                ++end;
-                
+                pointEnd = end + 1;
+                // 解析小数部分
+                end = parseNumber(name, text, pointEnd, getHexCharHandler());
+                mantissaEnd = end;
             }
-            end = parseNumber(name, text, offset, getHexCharHandler());
-            if (end == offset) {
-                putError(name + "_EMPTY_CONTENT", "Empty hex content", offset);
-            } else {
-                if (CharUtils.match(text, end, ".", false)) {
-                    // 十六进制小数，样式：0x1.xxxp-xxx
-                    ++end;
-                    numberBuilder.append('.');
-                    setInteger(false);
-                    name = "NUMBER_DEC_HEX";
-                    offset = end;
-                    end = parseNumber(name, text, end, getHexCharHandler());
-                }
+            if (pointEnd > intEnd && intEnd == intStart && mantissaEnd == pointEnd) {
+                // 只含有 点 即 0x. 非法格式
+                putError(name + "_MISSING_HEX_NUMBER_CHAR", "Missing hex number char", intEnd);
+            }
 
-                if (CharUtils.match(text, end, "p", true)) {
+            if (CharUtils.match(text, end, "p", true)) {
+                // 含有 p ，即含有指数部分，十六进制小数
+                if (isInteger()) {
                     setInteger(false);
                     name = "NUMBER_DEC_HEX";
-                    // 含有p字母
-                    ++end;
-                    numberBuilder.append('p');
-                    end = parsePower(name, text, end);
-                } else {
+                }
+                // 含有p字母
+                ++end;
+                numberBuilder.append('p');
+                end = parsePower(name, text, end);
+            } else {
+                if (!isInteger()) {
+                    // 十六进制小数，必须含有字母p
                     putError(name + "_MISSING_POWER", "Missing char: p", end);
                 }
             }
@@ -159,11 +164,11 @@ public class NumberParser extends CommonTextParser {
                     if (CharUtils.match(text, end, "e", true)) {
                         // 科学计数法，解析次方
                         numberBuilder.append('e');
-                        end = parsePower(name, text, end);
+                        end = parsePower(name, text, end + 1);
                     }
-                } else {
+                } /*else {
                     // 缺少尾数，合法
-                }
+                }*/
             }
         }
 
@@ -308,29 +313,17 @@ public class NumberParser extends CommonTextParser {
                         // 小数
                         if (getRadix() == 16) {
                             // 十六进制小数
-                            int pointIndex = str.indexOf('.');
-                            int powerIndex = str.indexOf('p');
-                            String firstStr, endStr;
-                            if (pointIndex > 0) {
-                                firstStr = str.substring(2, pointIndex);
-                                endStr = str.substring(pointIndex + 1, powerIndex);
+                            if ("F".equals(getSuffix())) {
+                                value = NumberUtils.parseHexDecimal32(str);
                             } else {
-                                firstStr = str.substring(2, powerIndex);
-                                endStr = "";
+                                value = NumberUtils.parseHexDecimal64(str);
                             }
-                            long firstNum = firstStr.length() > 0 ? Long.parseLong(firstStr, 16) : 0;
-                            long endNum = endStr.length() > 0 ? Long.parseLong(endStr, 16) : 0;
-                            String numStr = firstNum + "." + endNum;
-                            String powerStr = str.substring(powerIndex + 1);
-                            int power = Integer.parseInt(powerStr);
-                            value = new BigDecimal(numStr).multiply(new BigDecimal("2").pow(power));
                         } else {
                             value = new BigDecimal(str);
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println("InvalidNumber: " + str);
-                    throw e;
+                    throw new IllegalStateException("UNSUPPORTED: " + str, e);
                 }
             }
             return value;
