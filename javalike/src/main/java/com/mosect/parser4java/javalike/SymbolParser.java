@@ -1,4 +1,4 @@
-package com.mosect.parser4java.core.javalike;
+package com.mosect.parser4java.javalike;
 
 import com.mosect.parser4java.core.common.CommonTextParser;
 import com.mosect.parser4java.core.util.CharUtils;
@@ -21,6 +21,8 @@ public class SymbolParser extends CommonTextParser {
         // 其次到两个字符的操作符
         registerSymbol("<<");
         registerSymbol(">>");
+
+        registerSymbol("->");
 
         registerSymbol("+=");
         registerSymbol("-=");

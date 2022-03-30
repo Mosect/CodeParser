@@ -42,6 +42,15 @@ public class CommonNode implements Node {
     }
 
     @Override
+    public int getCharCount() {
+        int len = 0;
+        for (Node child : getChildren()) {
+            len += child.getCharCount();
+        }
+        return len;
+    }
+
+    @Override
     public void append(Appendable out) throws IOException {
         if (getChildCount() > 0) {
             for (Node child : getChildren()) {

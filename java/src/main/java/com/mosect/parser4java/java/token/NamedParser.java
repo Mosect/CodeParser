@@ -1,6 +1,8 @@
-package com.mosect.parser4java.java;
+package com.mosect.parser4java.java.token;
 
+import com.mosect.parser4java.core.Token;
 import com.mosect.parser4java.core.common.CommonTextParser;
+import com.mosect.parser4java.core.common.CommonToken;
 
 /**
  * 名称解析器，解析各类名称和关键字
@@ -33,6 +35,14 @@ public class NamedParser extends CommonTextParser {
         } else {
             finishParse(false, start);
         }
+    }
+
+    @Override
+    public Token makeToken() {
+        KeywordToken keywordToken = getKeywordToken();
+        if (null != keywordToken) return keywordToken;
+
+        return new CommonToken("java.named", getNameText());
     }
 
     public String getNameText() {

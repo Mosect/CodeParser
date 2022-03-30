@@ -23,6 +23,11 @@ public interface Token extends Node {
     }
 
     @Override
+    default int getCharCount() {
+        return getText().length();
+    }
+
+    @Override
     default void append(Appendable out) throws IOException {
         out.append(getText());
     }

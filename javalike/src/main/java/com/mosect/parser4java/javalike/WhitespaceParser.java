@@ -1,4 +1,4 @@
-package com.mosect.parser4java.core.javalike;
+package com.mosect.parser4java.javalike;
 
 import com.mosect.parser4java.core.common.CommonTextParser;
 import com.mosect.parser4java.core.util.CharUtils;
@@ -74,14 +74,5 @@ public class WhitespaceParser extends CommonTextParser {
     @Override
     public String getName() {
         return "javalike.whitespace";
-    }
-
-    @Override
-    public CharSequence getDisplayParseText() {
-        String name = getCharName();
-        if (null == name) {
-            return "<unknown>";
-        }
-        return name;
     }
 }

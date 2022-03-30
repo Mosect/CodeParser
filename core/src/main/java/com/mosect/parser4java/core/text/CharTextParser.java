@@ -1,5 +1,6 @@
-package com.mosect.parser4java.core.common;
+package com.mosect.parser4java.core.text;
 
+import com.mosect.parser4java.core.common.CommonTextParser;
 import com.mosect.parser4java.core.util.CharUtils;
 
 import java.util.Collection;

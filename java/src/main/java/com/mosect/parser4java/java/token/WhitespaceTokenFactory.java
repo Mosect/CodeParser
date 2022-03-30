@@ -1,4 +1,4 @@
-package com.mosect.parser4java.java;
+package com.mosect.parser4java.java.token;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,11 +32,11 @@ public class WhitespaceTokenFactory {
         }
     }
 
-    public WhitespaceToken createTokenByText(String text) {
+    public WhitespaceToken findTokenByText(String text) {
         return tokenMap.get(text);
     }
 
-    public WhitespaceToken createTokenByName(String charName) {
+    public WhitespaceToken findTokenByName(String charName) {
         return tokenNameMap.get(charName);
     }
 }

@@ -1,5 +1,7 @@
-package com.mosect.parser4java.java;
+package com.mosect.parser4java.java.token;
 
+import com.mosect.parser4java.core.Token;
+import com.mosect.parser4java.core.text.CharTextParser;
 import com.mosect.parser4java.core.common.CommonTextParser;
 import com.mosect.parser4java.core.util.CharUtils;
 
@@ -9,6 +11,7 @@ import com.mosect.parser4java.core.util.CharUtils;
 public class TextBlockParser extends CommonTextParser {
 
     private final StringBuilder stringBuilder = new StringBuilder(512);
+    private CharTextParser charTextParser = new CharTextParser();
     private String string;
 
     @Override
@@ -30,11 +33,12 @@ public class TextBlockParser extends CommonTextParser {
     protected void onParse(CharSequence text, int start) {
         String bound = "\"\"\"";
         StringBuilder stringBuilder = getStringBuilder();
+        CharTextParser charTextParser = getCharTextParser();
         if (CharUtils.match(text, start, bound, false)) {
             int offset = start + 3;
             int end = text.length(); // 结束位置
             boolean endBound = false; // 是否含有结束边界
-            int textStart = -1; // 文本开始位置
+            boolean textStart = false; // 文本是否开始
             String lastLinefeed = null; // 上一个换行符
             int lineCount = 0; // 文本行数量
             while (offset < text.length()) {
@@ -42,9 +46,6 @@ public class TextBlockParser extends CommonTextParser {
                     // 文本区域结束
                     end = offset + 3;
                     endBound = true;
-                    if (textStart >= 0) {
-                        stringBuilder.append(text, textStart, offset);
-                    }
                     break;
                 }
 
@@ -61,25 +62,32 @@ public class TextBlockParser extends CommonTextParser {
 
                 if (null != linefeed) {
                     // 遇到换行
-                    if (textStart >= 0) {
-                        if (lineCount > 0) {
-                            stringBuilder.append(lastLinefeed);
-                        }
-                        stringBuilder.append(text, textStart, offset);
+                    if (textStart) {
                         ++lineCount;
                     }
                     offset += linefeed.length();
-                    textStart = -1;
+                    textStart = false;
                     lastLinefeed = linefeed;
                     continue;
                 }
 
-                if (textStart < 0) {
-                    if (!isWhitespaceChar(text.charAt(offset))) {
-                        textStart = offset;
+                if (textStart || !isWhitespaceChar(text.charAt(offset))) {
+                    if (!textStart) textStart = true;
+
+                    if (lineCount > 0) {
+                        stringBuilder.append(lastLinefeed);
                     }
+                    charTextParser.parse(text, offset);
+                    if (charTextParser.isSuccess()) {
+                        stringBuilder.append(charTextParser.getValue());
+                        offset = charTextParser.getTextEnd();
+                    } else {
+                        stringBuilder.append(text.charAt(offset));
+                        ++offset;
+                    }
+                } else {
+                    ++offset;
                 }
-                ++offset;
             }
 
             if (!endBound) {
@@ -90,6 +98,12 @@ public class TextBlockParser extends CommonTextParser {
         } else {
             finishParse(false, start);
         }
+    }
+
+    @Override
+    public Token makeToken() {
+        String text = getParseText().toString();
+        return new StringToken(getName(), text, getString());
     }
 
     protected boolean isWhitespaceChar(char ch) {
@@ -104,6 +118,14 @@ public class TextBlockParser extends CommonTextParser {
 
     protected StringBuilder getStringBuilder() {
         return stringBuilder;
+    }
+
+    public CharTextParser getCharTextParser() {
+        return charTextParser;
+    }
+
+    protected void setCharTextParser(CharTextParser charTextParser) {
+        this.charTextParser = charTextParser;
     }
 
     public String getString() {

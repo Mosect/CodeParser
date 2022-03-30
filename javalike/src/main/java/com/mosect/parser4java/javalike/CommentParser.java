@@ -1,4 +1,4 @@
-package com.mosect.parser4java.core.javalike;
+package com.mosect.parser4java.javalike;
 
 import com.mosect.parser4java.core.common.CommonTextParser;
 import com.mosect.parser4java.core.util.CharUtils;
@@ -72,13 +72,5 @@ public class CommentParser extends CommonTextParser {
     @Override
     public String getName() {
         return "javalike.comment";
-    }
-
-    @Override
-    public CharSequence getDisplayParseText() {
-        if (isSuccess()) {
-            return getCommentName();
-        }
-        return "<unknown>";
     }
 }

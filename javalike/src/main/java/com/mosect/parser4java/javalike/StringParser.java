@@ -1,7 +1,7 @@
-package com.mosect.parser4java.core.javalike;
+package com.mosect.parser4java.javalike;
 
-import com.mosect.parser4java.core.common.CharTextParser;
 import com.mosect.parser4java.core.common.CommonTextParser;
+import com.mosect.parser4java.core.text.CharTextParser;
 import com.mosect.parser4java.core.util.CharUtils;
 
 /**

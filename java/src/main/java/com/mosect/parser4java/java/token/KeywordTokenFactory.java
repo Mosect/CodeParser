@@ -1,4 +1,4 @@
-package com.mosect.parser4java.java;
+package com.mosect.parser4java.java.token;
 
 import java.util.HashMap;
 import java.util.Map;

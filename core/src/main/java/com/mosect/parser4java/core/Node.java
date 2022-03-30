@@ -37,6 +37,13 @@ public interface Node extends Iterable<Node> {
     List<Node> getChildren();
 
     /**
+     * 获取字符数量
+     *
+     * @return 字符数量
+     */
+    int getCharCount();
+
+    /**
      * 将节点字符串追加到目标对象
      *
      * @param out 目标输出对象
