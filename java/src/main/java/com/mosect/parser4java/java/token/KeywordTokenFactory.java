@@ -46,6 +46,7 @@ public class KeywordTokenFactory {
         );
         register("default", new KeywordToken.Data()
                 .setInstructed(true)
+                .setModifyMethod(true)
         );
         register("do", new KeywordToken.Data()
                 .setInstructed(true)

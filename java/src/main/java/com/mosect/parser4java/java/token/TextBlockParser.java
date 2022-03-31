@@ -1,8 +1,8 @@
 package com.mosect.parser4java.java.token;
 
 import com.mosect.parser4java.core.Token;
-import com.mosect.parser4java.core.text.CharTextParser;
 import com.mosect.parser4java.core.common.CommonTextParser;
+import com.mosect.parser4java.core.text.CharTextParser;
 import com.mosect.parser4java.core.util.CharUtils;
 
 /**
@@ -16,7 +16,7 @@ public class TextBlockParser extends CommonTextParser {
 
     @Override
     public String getName() {
-        return "java.text.block";
+        return "java.textBlock";
     }
 
     @Override

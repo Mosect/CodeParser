@@ -1,5 +1,6 @@
 package com.mosect.parser4java.core.common;
 
+import com.mosect.parser4java.core.Node;
 import com.mosect.parser4java.core.Token;
 
 /**
@@ -9,6 +10,7 @@ public class CommonToken implements Token {
 
     private final String type;
     private final String text;
+    private Node parent;
 
     public CommonToken(String type, String text) {
         this.type = type;
@@ -18,6 +20,16 @@ public class CommonToken implements Token {
     @Override
     public String getType() {
         return type;
+    }
+
+    @Override
+    public Node getParent() {
+        return parent;
+    }
+
+    @Override
+    public void setParent(Node parent) {
+        this.parent = parent;
     }
 
     @Override
