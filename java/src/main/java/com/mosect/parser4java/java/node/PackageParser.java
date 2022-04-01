@@ -1,37 +1,50 @@
 package com.mosect.parser4java.java.node;
 
-import com.mosect.parser4java.core.Token;
-import com.mosect.parser4java.java.token.KeywordToken;
+import com.mosect.parser4java.core.Node;
+import com.mosect.parser4java.core.NodeSource;
+import com.mosect.parser4java.java.NameConstants;
+import com.mosect.parser4java.java.util.NodeUtils;
 
-/**
- * 包节点解析器
- */
 public class PackageParser extends BaseParser {
 
-    protected ClassNameParser classNameParser = new ClassNameParser();
+    protected RefPathParser refPathParser;
+
+    public PackageParser(ParserFactory factory) {
+        super(factory);
+        refPathParser = getParseByName(NameConstants.PARSER_REF_PATH);
+    }
 
     @Override
     public String getName() {
-        return "java.package";
+        return NameConstants.PARSER_PACKAGE;
     }
 
     @Override
-    protected void onClear() {
-        super.onClear();
+    protected boolean onParse(NodeSource source, boolean newStart) {
+        if (newStart) {
+            Node currentNode = source.currentNode();
+            // 查找 package
+            if (NodeUtils.isKeywordNode(currentNode, "package")) {
+                Node node = setNodeWithChild(currentNode);
+                source.setStartAfterOffset();
+                skipIgnore();
+                if (refPathParser.parse(this, source)) {
+                    node.addChild(refPathParser.getNode());
+                }
+                skipIgnore();
+                currentNode = source.currentNode();
+                if (source.hasMore() && NodeUtils.isSymbolNode(source.currentNode(), ";")) {
+                    node.addChild(currentNode);
+                    source.setStartAfterOffset();
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
-    protected boolean isNodeStart(int offset, Token token) {
-        return token instanceof KeywordToken && "package".equals(token.getText());
-    }
-
-    @Override
-    protected boolean isNodeEnd(int offset, Token token) {
-        return "java.symbol".equals(token.getType()) && ";".equals(token.getText());
-    }
-
-    @Override
-    protected int onProcessNodeValidToken(int offset, Token token) {
-        return 0;
+    protected Node createNode() {
+        return new PackageNode(NameConstants.NODE_PACKAGE);
     }
 }

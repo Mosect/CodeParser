@@ -23,6 +23,7 @@ public class SymbolParser extends CommonTextParser {
         registerSymbol(">>");
 
         registerSymbol("->");
+        registerSymbol("::");
 
         registerSymbol("+=");
         registerSymbol("-=");

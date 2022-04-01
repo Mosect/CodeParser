@@ -3,6 +3,7 @@ package com.mosect.parser4java.java.token;
 import com.mosect.parser4java.core.Token;
 import com.mosect.parser4java.core.common.CommonTextParser;
 import com.mosect.parser4java.core.common.CommonToken;
+import com.mosect.parser4java.java.NameConstants;
 
 /**
  * 名称解析器，解析各类名称和关键字
@@ -42,7 +43,7 @@ public class NamedParser extends CommonTextParser {
         KeywordToken keywordToken = getKeywordToken();
         if (null != keywordToken) return keywordToken;
 
-        return new CommonToken("java.named", getNameText());
+        return new CommonToken(NameConstants.TOKEN_NAMED, getNameText());
     }
 
     public String getNameText() {
@@ -63,7 +64,7 @@ public class NamedParser extends CommonTextParser {
 
     @Override
     public String getName() {
-        return "java.name";
+        return NameConstants.PARSER_NAMED;
     }
 
     protected void setKeywordTokenFactory(KeywordTokenFactory keywordTokenFactory) {

@@ -2,8 +2,8 @@ package com.mosect.parser4java.core.common;
 
 import com.mosect.parser4java.core.Node;
 import com.mosect.parser4java.core.NodeParser;
+import com.mosect.parser4java.core.NodeSource;
 import com.mosect.parser4java.core.ParseError;
-import com.mosect.parser4java.core.Token;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,20 +13,26 @@ import java.util.List;
  */
 public abstract class CommonNodeParser implements NodeParser {
 
-    private List<Token> tokenList;
-    private int tokenStart;
-    private int tokenEnd;
-    private boolean pass;
+    private NodeParser parent;
+    private NodeSource source;
+    private int nodeStart;
     private Node node;
     private final List<ParseError> errors = new ArrayList<>();
 
     @Override
-    public void parse(List<Token> tokenList, int offset) {
-        onClear();
-        this.tokenList = tokenList;
-        tokenStart = offset;
-        tokenEnd = offset;
-        onParse(tokenList, offset);
+    public boolean parse(NodeParser parent, NodeSource source) {
+        this.parent = parent;
+        boolean newStart = false;
+        if (this.source != source || nodeStart != source.getStart()) {
+            this.source = source;
+            this.nodeStart = source.getStart();
+            onClear();
+            newStart = true;
+        }
+        if (source.hasMore()) {
+            return onParse(source, newStart);
+        }
+        return false;
     }
 
     @Override
@@ -40,28 +46,17 @@ public abstract class CommonNodeParser implements NodeParser {
     }
 
     @Override
-    public boolean isPass() {
-        return pass;
-    }
-
-    @Override
-    public int getTokenStart() {
-        return tokenStart;
-    }
-
-    @Override
-    public int getTokenEnd() {
-        return tokenEnd;
-    }
-
-    @Override
-    public List<Token> getTokenList() {
-        return tokenList;
-    }
-
-    @Override
     public Node getNode() {
         return node;
+    }
+
+    @Override
+    public NodeSource getSource() {
+        return source;
+    }
+
+    protected NodeParser getParent() {
+        return parent;
     }
 
     protected void onClear() {
@@ -71,11 +66,6 @@ public abstract class CommonNodeParser implements NodeParser {
 
     protected void setNode(Node node) {
         this.node = node;
-    }
-
-    protected void finishParse(boolean pass, int tokenEnd) {
-        this.pass = pass;
-        this.tokenEnd = tokenEnd;
     }
 
     /**
@@ -98,13 +88,5 @@ public abstract class CommonNodeParser implements NodeParser {
         errors.add(error);
     }
 
-    /**
-     * 解析逻辑<br>
-     * 期间需要调用{@link #finishParse(boolean, int) finishParse}结束解析<br>
-     * 调用{@link #putError(ParseError)} 或者{@link #putError(String, String, int)}设置错误
-     *
-     * @param tokenList token列表
-     * @param offset    偏移量
-     */
-    protected abstract void onParse(List<Token> tokenList, int offset);
+    protected abstract boolean onParse(NodeSource source, boolean newStart);
 }
