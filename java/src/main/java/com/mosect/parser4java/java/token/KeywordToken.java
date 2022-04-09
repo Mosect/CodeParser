@@ -14,6 +14,10 @@ public class KeywordToken extends CommonToken {
         this.data = data;
     }
 
+    protected KeywordToken(KeywordToken other) {
+        this(other.getType(), other.getText(), other.data);
+    }
+
     public boolean isModifyClass() {
         return data.modifyClass;
     }

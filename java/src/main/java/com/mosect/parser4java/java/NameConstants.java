@@ -17,6 +17,7 @@ public class NameConstants {
     // 节点名称
 
     public final static String NODE_PACKAGE = "java.node.package";
+    public final static String NODE_IMPORT = "java.node.import";
 
     // 文本解析器
 
@@ -29,15 +30,8 @@ public class NameConstants {
     public final static String PARSER_TEXT_BLOCK = "java.parser.textBlock";
     public final static String PARSER_WHITESPACE = "java.parser.whitespace";
 
-    // 节点解析器
+    // 区域处理器
 
-    public final static String PARSER_ANNOTATION = "java.parser.annotation";
-    public final static String PARSER_CLASS = "java.parser.class";
-    public final static String PARSER_ENUM = "java.parser.enum";
-    public final static String PARSER_IGNORE = "java.parser.ignore";
-    public final static String PARSER_IMPORT = "java.parser.import";
-    public final static String PARSER_INTERFACE = "java.parser.interface";
-    public final static String PARSER_PACKAGE = "java.parser.package";
-    public final static String PARSER_ROOT = "java.parser.root";
-    public final static String PARSER_REF_PATH = "java.parser.refPath";
+    public final static String REGION_HANDLER_PACKAGE = "java.regionHandler.package";
+    public final static String REGION_HANDLER_IMPORT = "java.regionHandler.import";
 }

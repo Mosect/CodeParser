@@ -34,11 +34,19 @@ public class WhitespaceTokenFactory {
         }
     }
 
-    public WhitespaceToken findTokenByText(String text) {
-        return tokenMap.get(text);
+    public WhitespaceToken createTokenByText(String text) {
+        WhitespaceToken token = tokenMap.get(text);
+        if (null != token) {
+            return new WhitespaceToken(token);
+        }
+        return null;
     }
 
-    public WhitespaceToken findTokenByName(String charName) {
-        return tokenNameMap.get(charName);
+    public WhitespaceToken createTokenByName(String charName) {
+        WhitespaceToken token = tokenNameMap.get(charName);
+        if (null != token) {
+            return new WhitespaceToken(token);
+        }
+        return null;
     }
 }

@@ -15,7 +15,7 @@ public class WhitespaceParser extends com.mosect.parser4java.javalike.Whitespace
     @Override
     public Token makeToken() {
         String text = getParseText().toString();
-        return getWhitespaceTokenFactory().findTokenByText(text);
+        return getWhitespaceTokenFactory().createTokenByText(text);
     }
 
     public WhitespaceTokenFactory getWhitespaceTokenFactory() {

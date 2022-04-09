@@ -2,6 +2,9 @@ package com.mosect.parser4java.core.organizer;
 
 import com.mosect.parser4java.core.Node;
 
+/**
+ * 节点区域
+ */
 public class NodeRegion {
 
     private final Node node;

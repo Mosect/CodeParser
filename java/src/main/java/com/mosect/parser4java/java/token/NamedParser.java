@@ -31,7 +31,7 @@ public class NamedParser extends CommonTextParser {
             finishParse(true, text.length());
             String nameText = getParseText().toString();
             setNameText(nameText);
-            KeywordToken keywordToken = getKeywordTokenFactory().findTokenByText(nameText);
+            KeywordToken keywordToken = getKeywordTokenFactory().createTokenByText(nameText);
             setKeywordToken(keywordToken);
         } else {
             finishParse(false, start);

@@ -1,10 +1,12 @@
 package com.mosect.parser4java.java;
 
+import com.mosect.parser4java.core.Node;
 import com.mosect.parser4java.core.ParseError;
 import com.mosect.parser4java.core.TextParser;
 import com.mosect.parser4java.core.TextSource;
 import com.mosect.parser4java.core.Token;
 import com.mosect.parser4java.core.util.ParserSet;
+import com.mosect.parser4java.java.organizer.JavaNodeOrganizer;
 import com.mosect.parser4java.java.token.CharParser;
 import com.mosect.parser4java.java.token.CommentParser;
 import com.mosect.parser4java.java.token.NamedParser;
@@ -26,31 +28,28 @@ public class JavaParser {
     protected ParserSet parserSet2;
 
     protected final List<Token> tokenList = new ArrayList<>(512);
+    protected JavaNodeOrganizer nodeOrganizer = new JavaNodeOrganizer();
+    private List<Node> nodes;
 
     public JavaParser() {
-        // 第一遍解析
-        parserSet1 = new ParserSet() {
-            @Override
-            protected void processParser(TextSource source, TextParser parser) {
-                JavaParser.this.processParser(source, parser);
-            }
-        };
+        // 第一层解析
+        parserSet1 = new InternalParserSet();
         parserSet1.addParser(new CommentParser());
         parserSet1.addParser(new TextBlockParser());
         parserSet1.addParser(new StringParser());
         parserSet1.addParser(new CharParser());
         parserSet1.addParser(new WhitespaceParser());
 
-        // 第二遍解析
-        parserSet2 = new ParserSet() {
-            @Override
-            protected void processParser(TextSource source, TextParser parser) {
-                JavaParser.this.processParser(source, parser);
-            }
-        };
+        // 第二层解析
+        parserSet2 = new InternalParserSet();
         parserSet2.addParser(new NumberParser());
         parserSet2.addParser(new SymbolParser());
-        parserSet2.addParser(new NamedParser());
+
+        // 第三层解析
+        ParserSet parserSet3 = new InternalParserSet();
+        parserSet3.addParser(new NamedParser());
+
+        parserSet2.setChildParserSet(parserSet3);
 
         parserSet1.setChildParserSet(parserSet2);
     }
@@ -58,6 +57,11 @@ public class JavaParser {
     public void parse(TextSource source, int start) {
         onClear();
         parserSet1.parse(source, start);
+        nodes = nodeOrganizer.organize(tokenList, 0);
+    }
+
+    public List<Node> getNodes() {
+        return nodes;
     }
 
     protected void processParser(TextSource source, TextParser parser) {
@@ -80,5 +84,22 @@ public class JavaParser {
 
     protected void onClear() {
         tokenList.clear();
+        nodes = null;
+    }
+
+    class InternalParserSet extends ParserSet {
+
+        @Override
+        protected void processParser(TextSource source, TextParser parser) {
+            JavaParser.this.processParser(source, parser);
+        }
+
+        @Override
+        protected boolean canParse(TextSource source, TextParser parser, int offset, int unknownStart) {
+            if (NameConstants.PARSER_NUMBER.equals(parser.getName())) {
+                return offset == unknownStart;
+            }
+            return true;
+        }
     }
 }

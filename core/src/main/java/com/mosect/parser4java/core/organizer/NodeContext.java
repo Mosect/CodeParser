@@ -48,7 +48,8 @@ public class NodeContext {
     void removeLastUncloseRegions(int count) {
         int size = Math.max(0, unclosedRegions.size() - count);
         while (unclosedRegions.size() > size) {
-            unclosedRegions.remove(unclosedRegions.size() - 1);
+            NodeRegion region = unclosedRegions.remove(unclosedRegions.size() - 1);
+            region.setUnclosedIndex(-1);
         }
     }
 

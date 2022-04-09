@@ -1,5 +1,6 @@
 package com.mosect.parser4java.java;
 
+import com.mosect.parser4java.core.Node;
 import com.mosect.parser4java.core.source.InputStreamSource;
 import com.mosect.parser4java.core.util.NumberUtils;
 
@@ -73,7 +74,19 @@ public class JavaTest {
         try (FileInputStream fis = new FileInputStream(javaFile)) {
             InputStreamSource source = new InputStreamSource(fis, "UTF-8");
             javaParser.parse(source, 0);
+            for (Node node : javaParser.getNodes()) {
+                if (!node.isToken()) {
+                    printNode(node);
+                }
+            }
         }
+    }
+
+    private void printNode(Node node) throws Exception {
+        StringBuilder builder = new StringBuilder(64);
+        builder.append("Node.").append(node.getType()).append(": ");
+        node.append(builder);
+        System.out.println(builder);
     }
 
     private void listJavaFiles(File file, List<File> outList) {

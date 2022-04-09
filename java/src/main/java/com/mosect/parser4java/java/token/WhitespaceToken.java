@@ -11,6 +11,10 @@ public class WhitespaceToken extends CommonToken {
         this.charName = charName;
     }
 
+    public WhitespaceToken(WhitespaceToken other) {
+        this(other.getType(), other.getText(), other.charName);
+    }
+
     public String getCharName() {
         return charName;
     }

@@ -56,10 +56,12 @@ public abstract class ParserSet {
         while (offset < text.length()) {
             TextParser validParser = null;
             for (TextParser parser : parsers) {
-                parser.parse(text, offset);
-                if (parser.isPass()) {
-                    validParser = parser;
-                    break;
+                if (canParse(source, parser, offset, unknownStart)) {
+                    parser.parse(text, offset);
+                    if (parser.isPass()) {
+                        validParser = parser;
+                        break;
+                    }
                 }
             }
             if (null == validParser) {
@@ -72,6 +74,10 @@ public abstract class ParserSet {
             }
         }
         handleChildParserSet(sourceWrapper, unknownStart, text.length());
+    }
+
+    protected boolean canParse(TextSource source, TextParser parser, int offset, int unknownStart) {
+        return true;
     }
 
     /**

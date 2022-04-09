@@ -187,7 +187,11 @@ public class KeywordTokenFactory {
         tokenMap.remove(text);
     }
 
-    public KeywordToken findTokenByText(String text) {
-        return tokenMap.get(text);
+    public KeywordToken createTokenByText(String text) {
+        KeywordToken token = tokenMap.get(text);
+        if (null != token) {
+            return new KeywordToken(token);
+        }
+        return null;
     }
 }

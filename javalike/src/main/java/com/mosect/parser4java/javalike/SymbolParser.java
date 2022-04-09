@@ -3,15 +3,16 @@ package com.mosect.parser4java.javalike;
 import com.mosect.parser4java.core.common.CommonTextParser;
 import com.mosect.parser4java.core.util.CharUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeSet;
+import java.util.List;
 
 /**
  * 符号解析器
  */
 public class SymbolParser extends CommonTextParser {
 
-    private final TreeSet<String> symbolSet = new TreeSet<>();
+    private final List<String> symbolSet = new ArrayList<>();
     private String symbol;
 
     public SymbolParser() {
@@ -38,6 +39,7 @@ public class SymbolParser extends CommonTextParser {
         registerSymbol("==");
 
         // 一个字符的操作符，优先级最低
+        registerSymbol(".");
         registerSymbol("!");
 
         registerSymbol("(");
