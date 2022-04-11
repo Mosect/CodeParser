@@ -99,6 +99,9 @@ public class KeywordTokenFactory {
         register("interface", new KeywordToken.Data()
                 .setDefinition(true)
         );
+        register("@interface", new KeywordToken.Data()
+                .setDefinition(true)
+        );
         register("long", new KeywordToken.Data()
                 .setPrimitive(true)
         );

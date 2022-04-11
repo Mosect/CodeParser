@@ -3,7 +3,6 @@ package com.mosect.parser4java.java.organizer;
 import com.mosect.parser4java.core.Node;
 import com.mosect.parser4java.core.Token;
 import com.mosect.parser4java.core.organizer.NodeContext;
-import com.mosect.parser4java.core.organizer.NodeOrganizer;
 import com.mosect.parser4java.core.organizer.NodeRegion;
 import com.mosect.parser4java.core.organizer.NodeRegionHandler;
 import com.mosect.parser4java.java.NameConstants;
@@ -15,14 +14,14 @@ import java.util.Objects;
 public abstract class BaseNodeRegionHandler implements NodeRegionHandler {
 
     @Override
-    public int getRegionStart(NodeOrganizer organizer, NodeContext context, NodeRegion parent, int start, int offset) {
+    public int getRegionStart(NodeContext context, NodeRegion parent, int start, int offset) {
         Node srcNode = context.getSource().get(offset);
         if (srcNode.isToken()) {
             switch (srcNode.getType()) {
                 case NameConstants.TOKEN_KEYWORD:
-                    return getRegionStartWithKeyword(organizer, context, parent, start, offset, (KeywordToken) srcNode);
+                    return getRegionStartWithKeyword(context, parent, start, offset, (KeywordToken) srcNode);
                 case NameConstants.TOKEN_SYMBOL:
-                    return getRegionStartWithSymbol(organizer, context, parent, start, offset, (Token) srcNode);
+                    return getRegionStartWithSymbol(context, parent, start, offset, (Token) srcNode);
                 default:
                     break;
             }
@@ -31,14 +30,14 @@ public abstract class BaseNodeRegionHandler implements NodeRegionHandler {
     }
 
     @Override
-    public EndState getRegionEnd(NodeOrganizer organizer, NodeContext context, NodeRegion region, int offset) {
+    public EndState getRegionEnd(NodeContext context, NodeRegion region, int offset) {
         Node srcNode = context.getSource().get(offset);
         if (srcNode.isToken()) {
             switch (srcNode.getType()) {
                 case NameConstants.TOKEN_KEYWORD:
-                    return getRegionEndWithKeyword(organizer, context, region, offset, (KeywordToken) srcNode);
+                    return getRegionEndWithKeyword(context, region, offset, (KeywordToken) srcNode);
                 case NameConstants.TOKEN_SYMBOL:
-                    return getRegionEndWithSymbol(organizer, context, region, offset, (Token) srcNode);
+                    return getRegionEndWithSymbol(context, region, offset, (Token) srcNode);
                 default:
                     break;
             }
@@ -47,8 +46,18 @@ public abstract class BaseNodeRegionHandler implements NodeRegionHandler {
     }
 
     @Override
-    public int getForceEndIndex(NodeOrganizer organizer, NodeContext context, NodeRegion region) {
+    public int getForceEndIndex(NodeContext context, NodeRegion region) {
         return NodeUtils.trimEnd(context, region.getStart(), context.getRegionCount());
+    }
+
+    @Override
+    public void onRegionAdded(NodeContext context, NodeRegion region) {
+
+    }
+
+    @Override
+    public void onRegionClosed(NodeContext context, NodeRegion region) {
+
     }
 
     /**
@@ -67,31 +76,36 @@ public abstract class BaseNodeRegionHandler implements NodeRegionHandler {
      * @return 区域区间是否为兄弟区域
      */
     public boolean isBrother(NodeRegionHandler other) {
+        switch (other.getName()) {
+            case NameConstants.REGION_HANDLER_IMPORT:
+            case NameConstants.REGION_HANDLER_PACKAGE:
+                return true;
+        }
         return Objects.equals(getName(), other.getName());
     }
 
-    protected int getRegionStartWithKeyword(NodeOrganizer organizer, NodeContext context, NodeRegion parent, int start, int offset, KeywordToken token) {
+    protected int getRegionStartWithKeyword(NodeContext context, NodeRegion parent, int start, int offset, KeywordToken token) {
         if (isRegionStartKeyword(token)) {
             return NodeUtils.trimStart(context, start, offset);
         }
         return -1;
     }
 
-    protected int getRegionStartWithSymbol(NodeOrganizer organizer, NodeContext context, NodeRegion parent, int start, int offset, Token token) {
+    protected int getRegionStartWithSymbol(NodeContext context, NodeRegion parent, int start, int offset, Token token) {
         if (isRegionStartSymbol(token)) {
             return NodeUtils.trimStart(context, start, offset);
         }
         return -1;
     }
 
-    protected EndState getRegionEndWithKeyword(NodeOrganizer organizer, NodeContext context, NodeRegion region, int offset, KeywordToken token) {
+    protected EndState getRegionEndWithKeyword(NodeContext context, NodeRegion region, int offset, KeywordToken token) {
         if (isRegionEndKeyword(token)) {
             return EndState.CLOSED_AND_CONSUMED;
         }
         return EndState.NONE;
     }
 
-    protected EndState getRegionEndWithSymbol(NodeOrganizer organizer, NodeContext context, NodeRegion region, int offset, Token token) {
+    protected EndState getRegionEndWithSymbol(NodeContext context, NodeRegion region, int offset, Token token) {
         if (isRegionEndSymbol(token)) {
             return EndState.CLOSED_AND_CONSUMED;
         }

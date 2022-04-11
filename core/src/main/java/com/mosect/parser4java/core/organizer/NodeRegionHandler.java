@@ -12,11 +12,15 @@ public interface NodeRegionHandler {
 
     String getName();
 
-    int getRegionStart(NodeOrganizer organizer, NodeContext context, NodeRegion parent, int start, int offset);
+    int getRegionStart(NodeContext context, NodeRegion parent, int start, int offset);
 
-    Node createNode(NodeOrganizer organizer, NodeContext context, NodeRegion parent, int start, int offset);
+    Node createNode(NodeContext context, NodeRegion parent, int start, int offset);
 
-    EndState getRegionEnd(NodeOrganizer organizer, NodeContext context, NodeRegion region, int offset);
+    EndState getRegionEnd(NodeContext context, NodeRegion region, int offset);
 
-    int getForceEndIndex(NodeOrganizer organizer, NodeContext context, NodeRegion region);
+    int getForceEndIndex(NodeContext context, NodeRegion region);
+
+    void onRegionAdded(NodeContext context, NodeRegion region);
+
+    void onRegionClosed(NodeContext context, NodeRegion region);
 }

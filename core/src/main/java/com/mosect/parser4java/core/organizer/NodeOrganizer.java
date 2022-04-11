@@ -20,7 +20,7 @@ public class NodeOrganizer {
      * @return 节点列表
      */
     public List<Node> organize(List<? extends Node> source, int offset) {
-        NodeContext context = new NodeContext(source);
+        NodeContext context = new NodeContext(this, source);
         return organize(null, context, offset, offset);
     }
 
@@ -41,11 +41,9 @@ public class NodeOrganizer {
         if (unclosedCount > 0) {
             for (int i = unclosedCount - 1; i >= 0; i--) {
                 NodeRegion region = context.getUnclosedRegion(i);
-                int end = region.getHandler().getForceEndIndex(this, context, region);
-                region.setEnd(end);
-                onRegionClosed(context, region);
+                int end = region.getHandler().getForceEndIndex(context, region);
+                context.closeRegion(region.getUnclosedIndex(), end, region1 -> onRegionClosed(context, region1));
             }
-            context.removeLastUncloseRegions(unclosedCount);
         }
 
         // 组合节点
@@ -96,7 +94,7 @@ public class NodeOrganizer {
         int regionStart = -1;
         NodeRegionHandler regionHandler = null;
         for (NodeRegionHandler handler : getHandlers()) {
-            regionStart = handler.getRegionStart(this, context, parent, start, offset);
+            regionStart = handler.getRegionStart(context, parent, start, offset);
             if (regionStart >= 0) {
                 regionHandler = handler;
                 break;
@@ -114,14 +112,14 @@ public class NodeOrganizer {
                 safeParent = context.getUnclosedRegion(context.getUnclosedRegionCount() - 1);
             }
 
-            Node node = regionHandler.createNode(this, context, safeParent, start, offset);
-            NodeRegion nodeRegion = new NodeRegion(node, regionHandler, parent);
+            Node node = regionHandler.createNode(context, safeParent, start, offset);
+            NodeRegion nodeRegion = new NodeRegion(node, regionHandler, safeParent);
             nodeRegion.setStart(regionStart);
             nodeRegion.setEnd(offset + 1);
             context.addRegion(nodeRegion);
             onRegionAdded(context, nodeRegion);
             // 检查此区域是否完成
-            endState = regionHandler.getRegionEnd(this, context, nodeRegion, offset);
+            endState = regionHandler.getRegionEnd(context, nodeRegion, offset);
             if (endState == NodeRegionHandler.EndState.NONE) {
                 // 区域未结束
                 context.addUnclosedRegion(nodeRegion);
@@ -141,15 +139,15 @@ public class NodeOrganizer {
      */
     protected boolean onHandleRegionEnd(NodeContext context, int offset) {
         int checkUnclosedRegionCount = context.getUnclosedRegionCount();
-        int closedIndex = -1; // 已关闭的区域下标
+        NodeRegion unclosedRegion = null;
         boolean consumed = false;
         for (int i = checkUnclosedRegionCount - 1; i >= 0; i--) {
             NodeRegion region = context.getUnclosedRegion(i);
             NodeRegionHandler handler = region.getHandler();
-            NodeRegionHandler.EndState regionEndState = handler.getRegionEnd(this, context, region, offset);
+            NodeRegionHandler.EndState regionEndState = handler.getRegionEnd(context, region, offset);
             if (regionEndState != NodeRegionHandler.EndState.NONE) {
                 // 节点结束
-                closedIndex = i;
+                unclosedRegion = region;
                 if (regionEndState == NodeRegionHandler.EndState.CLOSED_AND_CONSUMED) {
                     // 当前位置已消耗
                     consumed = true;
@@ -157,19 +155,21 @@ public class NodeOrganizer {
                 }
             }
         }
-        if (closedIndex >= 0) {
-            // 存在已关闭的区域下标
-            int count = context.getUnclosedRegionCount();
-            // 关闭之后的所有区域
-            for (int i = count - 1; i >= closedIndex; i--) {
-                NodeRegion region = context.getUnclosedRegion(i);
-                region.setEnd(offset + 1);
-                onRegionClosed(context, region);
-            }
-            // 移除已关闭的区域
-            context.removeLastUncloseRegions(count - closedIndex);
+        if (null != unclosedRegion) {
+            closeRegion(context, unclosedRegion.getUnclosedIndex(), offset + 1);
         }
         return consumed;
+    }
+
+    /**
+     * 关闭区域
+     *
+     * @param context       节点上下文
+     * @param unclosedIndex 未关闭区域下标
+     * @param end           结束位置
+     */
+    public void closeRegion(NodeContext context, int unclosedIndex, int end) {
+        context.closeRegion(unclosedIndex, end, region -> onRegionClosed(context, region));
     }
 
     /**
@@ -188,27 +188,6 @@ public class NodeOrganizer {
      * @param region  节点区域
      */
     protected void onRegionClosed(NodeContext context, NodeRegion region) {
-    }
-
-    /**
-     * 关闭区域
-     *
-     * @param context 节点上下文
-     * @param region  节点区域
-     * @param end     节点结束位置
-     */
-    public void closeRegion(NodeContext context, NodeRegion region, int end) {
-        if (region.getUnclosedIndex() >= 0) {
-            for (int i = context.getUnclosedRegionCount() - 1; i >= region.getUnclosedIndex(); i--) {
-                NodeRegion unclosed = context.getUnclosedRegion(i);
-                unclosed.setEnd(end);
-                onRegionClosed(context, unclosed);
-            }
-            context.removeLastUncloseRegions(context.getUnclosedRegionCount() - region.getUnclosedIndex());
-        } else {
-            region.setEnd(end);
-            onRegionClosed(context, region);
-        }
     }
 
     /**

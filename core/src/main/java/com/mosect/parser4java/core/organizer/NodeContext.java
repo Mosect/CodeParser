@@ -7,12 +7,18 @@ import java.util.List;
 
 public class NodeContext {
 
+    private final NodeOrganizer organizer;
     private final List<? extends Node> source;
     private final List<NodeRegion> regions = new ArrayList<>(64);
     private final List<NodeRegion> unclosedRegions = new ArrayList<>(12);
 
-    public NodeContext(List<? extends Node> source) {
+    public NodeContext(NodeOrganizer organizer, List<? extends Node> source) {
+        this.organizer = organizer;
         this.source = source;
+    }
+
+    public NodeOrganizer getOrganizer() {
+        return organizer;
     }
 
     public List<? extends Node> getSource() {
@@ -38,6 +44,7 @@ public class NodeContext {
     void addRegion(NodeRegion region) {
         region.setIndex(regions.size());
         regions.add(region);
+        region.getHandler().onRegionAdded(this, region);
     }
 
     void addUnclosedRegion(NodeRegion region) {
@@ -45,15 +52,26 @@ public class NodeContext {
         unclosedRegions.add(region);
     }
 
-    void removeLastUncloseRegions(int count) {
-        int size = Math.max(0, unclosedRegions.size() - count);
-        while (unclosedRegions.size() > size) {
+    /**
+     * 关闭区域
+     *
+     * @param unclosedIndex    未关闭
+     * @param end              节点结束位置
+     * @param onClosedCallback 关闭回调
+     */
+    public void closeRegion(int unclosedIndex, int end, OnClosedCallback onClosedCallback) {
+        while (unclosedRegions.size() > unclosedIndex) {
             NodeRegion region = unclosedRegions.remove(unclosedRegions.size() - 1);
+            region.setEnd(end);
             region.setUnclosedIndex(-1);
+            if (null != onClosedCallback) {
+                region.getHandler().onRegionClosed(this, region);
+                onClosedCallback.onRegionClosed(region);
+            }
         }
     }
 
-    List<NodeRegion> getRegions() {
-        return regions;
+    public interface OnClosedCallback {
+        void onRegionClosed(NodeRegion region);
     }
 }

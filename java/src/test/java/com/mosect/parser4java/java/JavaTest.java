@@ -42,7 +42,7 @@ public class JavaTest {
     @Test
     public void testParser() throws Exception {
         changeOutput();
-        File file = new File("E:\\Temp\\java_src\\src\\java.base");
+        File file = new File("D:\\Work\\Temp\\java_src\\src\\java.base");
         List<File> list = new ArrayList<>();
         listJavaFiles(file, list);
         JavaParser javaParser = new JavaParser();
@@ -84,7 +84,7 @@ public class JavaTest {
 
     private void printNode(Node node) throws Exception {
         StringBuilder builder = new StringBuilder(64);
-        builder.append("Node.").append(node.getType()).append(": ");
+//        builder.append("Node.").append(node.getType()).append(": ");
         node.append(builder);
         System.out.println(builder);
     }

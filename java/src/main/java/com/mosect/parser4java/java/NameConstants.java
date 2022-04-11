@@ -18,6 +18,8 @@ public class NameConstants {
 
     public final static String NODE_PACKAGE = "java.node.package";
     public final static String NODE_IMPORT = "java.node.import";
+    public final static String NODE_TYPE = "java.node.type";
+    public final static String NODE_BRACE = "java.node.brace";
 
     // 文本解析器
 
@@ -34,4 +36,6 @@ public class NameConstants {
 
     public final static String REGION_HANDLER_PACKAGE = "java.regionHandler.package";
     public final static String REGION_HANDLER_IMPORT = "java.regionHandler.import";
+    public final static String REGION_HANDLER_TYPE = "java.regionHandler.type";
+    public final static String REGION_HANDLER_BRACE = "java.regionHandler.brace";
 }

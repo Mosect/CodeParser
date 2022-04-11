@@ -14,6 +14,9 @@ public class JavaNodeOrganizer extends NodeOrganizer {
     public JavaNodeOrganizer() {
         addHandler(new PackageNodeRegionHandler());
         addHandler(new ImportNodeRegionHandler());
+        addHandler(new TypeNodeRegionHandler());
+
+        addHandler(new BraceNodeRegionHandler());
     }
 
     @Override
@@ -22,14 +25,9 @@ public class JavaNodeOrganizer extends NodeOrganizer {
         List<? extends Node> source = context.getSource();
         while (curOffset < source.size()) {
             int curStart = getCurrentStart(context, start);
-            int oldRegionCount = context.getRegionCount();
             boolean consumed = onHandleRegionEnd(context, curOffset);
             if (!consumed) {
                 onHandleRegionStart(context, parent, curStart, curOffset);
-                if (context.getRegionCount() > oldRegionCount) {
-                    // 添加了节点区域
-                    curStart = curOffset + 1;
-                }
             }
 
             ++curOffset;
@@ -45,9 +43,9 @@ public class JavaNodeOrganizer extends NodeOrganizer {
             if (unclosedHandler instanceof BaseNodeRegionHandler) {
                 if (!((BaseNodeRegionHandler) unclosedHandler).isMustEndWithNode()) {
                     if (((BaseNodeRegionHandler) unclosedHandler).isBrother(region.getHandler())) {
-                        // 兄弟关系，介绍未关闭的区域
+                        // 兄弟关系，结束未关闭的区域
                         int end = NodeUtils.trimEnd(context, lastUnclosed.getStart(), region.getStart());
-                        closeRegion(context, lastUnclosed, end);
+                        closeRegion(context, lastUnclosed.getUnclosedIndex(), end);
                     }
                 }
             }

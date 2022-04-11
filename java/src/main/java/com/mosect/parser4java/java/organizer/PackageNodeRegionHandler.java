@@ -18,7 +18,7 @@ public class PackageNodeRegionHandler extends BaseNodeRegionHandler {
     }
 
     @Override
-    public Node createNode(NodeOrganizer organizer, NodeContext context, NodeRegion parent, int start, int offset) {
+    public Node createNode(NodeContext context, NodeRegion parent, int start, int offset) {
         return new PackageNode(NameConstants.NODE_PACKAGE);
     }
 
@@ -30,15 +30,5 @@ public class PackageNodeRegionHandler extends BaseNodeRegionHandler {
     @Override
     protected boolean isRegionEndSymbol(Token token) {
         return ";".equals(token.getText());
-    }
-
-    @Override
-    public boolean isBrother(NodeRegionHandler other) {
-        switch (other.getName()) {
-            case NameConstants.REGION_HANDLER_IMPORT:
-            case NameConstants.REGION_HANDLER_PACKAGE:
-                return true;
-        }
-        return super.isBrother(other);
     }
 }
