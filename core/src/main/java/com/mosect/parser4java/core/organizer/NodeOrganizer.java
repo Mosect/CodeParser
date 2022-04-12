@@ -73,7 +73,7 @@ public class NodeOrganizer {
                 curStart = lastRegion.getEnd();
             } else {
                 // 未闭合
-                curStart = lastRegion.getStart();
+                curStart = lastRegion.getChildStart();
             }
         } else {
             curStart = start;
@@ -115,6 +115,7 @@ public class NodeOrganizer {
             Node node = regionHandler.createNode(context, safeParent, start, offset);
             NodeRegion nodeRegion = new NodeRegion(node, regionHandler, safeParent);
             nodeRegion.setStart(regionStart);
+            nodeRegion.setChildStart(offset + 1);
             nodeRegion.setEnd(offset + 1);
             context.addRegion(nodeRegion);
             onRegionAdded(context, nodeRegion);
@@ -233,8 +234,12 @@ public class NodeOrganizer {
                     result.add(srcNode);
                 } else {
                     // 存在匹配区域
-                    if (null == region.getParent() && addedRegionIndex != regionIndex) {
-                        result.add(region.getNode());
+                    if (addedRegionIndex != regionIndex) {
+                        if (null == region.getParent()) {
+                            result.add(region.getNode());
+                        } else {
+                            region.getParent().getNode().addChild(region.getNode());
+                        }
                         addedRegionIndex = regionIndex;
                     }
                     if (i < region.getEnd()) {

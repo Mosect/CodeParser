@@ -12,6 +12,7 @@ public class NodeRegion {
     private final NodeRegion parent;
     private int start;
     private int end;
+    private int childStart;
     private int index = -1;
     private int unclosedIndex = -1;
 
@@ -37,15 +38,23 @@ public class NodeRegion {
         return start;
     }
 
-    void setStart(int start) {
+    public void setStart(int start) {
         this.start = start;
+    }
+
+    public int getChildStart() {
+        return childStart;
+    }
+
+    public void setChildStart(int childStart) {
+        this.childStart = childStart;
     }
 
     public int getEnd() {
         return end;
     }
 
-    void setEnd(int end) {
+    public void setEnd(int end) {
         this.end = end;
     }
 

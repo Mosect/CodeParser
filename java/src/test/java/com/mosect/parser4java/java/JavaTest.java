@@ -1,6 +1,7 @@
 package com.mosect.parser4java.java;
 
 import com.mosect.parser4java.core.Node;
+import com.mosect.parser4java.core.common.CommonNode;
 import com.mosect.parser4java.core.source.InputStreamSource;
 import com.mosect.parser4java.core.util.NumberUtils;
 
@@ -34,7 +35,7 @@ public class JavaTest {
     @Test
     public void testJavaParser() throws Exception {
         changeOutput();
-        File file = new File("D:\\Work\\Temp\\java_src\\src\\java.net.http\\java\\net\\http\\HttpClient.java");
+        File file = new File("E:\\Temp\\java_src\\src\\java.base\\com\\sun\\security\\ntlm\\Client.java");
         JavaParser javaParser = new JavaParser();
         parseJava(javaParser, file);
     }
@@ -74,11 +75,9 @@ public class JavaTest {
         try (FileInputStream fis = new FileInputStream(javaFile)) {
             InputStreamSource source = new InputStreamSource(fis, "UTF-8");
             javaParser.parse(source, 0);
-            for (Node node : javaParser.getNodes()) {
-                if (!node.isToken()) {
-                    printNode(node);
-                }
-            }
+            CommonNode node = new CommonNode("");
+            node.addChildren(javaParser.getNodes());
+            printNode(node);
         }
     }
 

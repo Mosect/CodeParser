@@ -86,14 +86,20 @@ public abstract class BaseNodeRegionHandler implements NodeRegionHandler {
 
     protected int getRegionStartWithKeyword(NodeContext context, NodeRegion parent, int start, int offset, KeywordToken token) {
         if (isRegionStartKeyword(token)) {
-            return NodeUtils.trimStart(context, start, offset);
+            if (isTrimStart()) {
+                return NodeUtils.trimStart(context, start, offset);
+            }
+            return offset;
         }
         return -1;
     }
 
     protected int getRegionStartWithSymbol(NodeContext context, NodeRegion parent, int start, int offset, Token token) {
         if (isRegionStartSymbol(token)) {
-            return NodeUtils.trimStart(context, start, offset);
+            if (isTrimStart()) {
+                return NodeUtils.trimStart(context, start, offset);
+            }
+            return offset;
         }
         return -1;
     }
@@ -110,6 +116,10 @@ public abstract class BaseNodeRegionHandler implements NodeRegionHandler {
             return EndState.CLOSED_AND_CONSUMED;
         }
         return EndState.NONE;
+    }
+
+    protected boolean isTrimStart() {
+        return true;
     }
 
     protected boolean isRegionStartKeyword(KeywordToken token) {

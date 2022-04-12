@@ -48,4 +48,9 @@ public class BraceNodeRegionHandler extends BaseNodeRegionHandler {
             }
         }
     }
+
+    @Override
+    protected boolean isTrimStart() {
+        return false;
+    }
 }
