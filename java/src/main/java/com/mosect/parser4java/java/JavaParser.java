@@ -6,7 +6,6 @@ import com.mosect.parser4java.core.TextParser;
 import com.mosect.parser4java.core.TextSource;
 import com.mosect.parser4java.core.Token;
 import com.mosect.parser4java.core.util.ParserSet;
-import com.mosect.parser4java.java.organizer.JavaNodeOrganizer;
 import com.mosect.parser4java.java.token.CharParser;
 import com.mosect.parser4java.java.token.CommentParser;
 import com.mosect.parser4java.java.token.NamedParser;
@@ -28,7 +27,6 @@ public class JavaParser {
     protected ParserSet parserSet2;
 
     protected final List<Token> tokenList = new ArrayList<>(512);
-    protected JavaNodeOrganizer nodeOrganizer = new JavaNodeOrganizer();
     private List<Node> nodes;
 
     public JavaParser() {
@@ -57,7 +55,6 @@ public class JavaParser {
     public void parse(TextSource source, int start) {
         onClear();
         parserSet1.parse(source, start);
-        nodes = nodeOrganizer.organize(tokenList, 0);
     }
 
     public List<Node> getNodes() {

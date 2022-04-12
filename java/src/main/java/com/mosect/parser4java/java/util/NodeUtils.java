@@ -2,7 +2,6 @@ package com.mosect.parser4java.java.util;
 
 import com.mosect.parser4java.core.Node;
 import com.mosect.parser4java.core.Token;
-import com.mosect.parser4java.core.organizer.NodeContext;
 import com.mosect.parser4java.java.NameConstants;
 import com.mosect.parser4java.java.token.KeywordToken;
 

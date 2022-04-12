@@ -7,7 +7,17 @@ import java.util.List;
 /**
  * 节点
  */
-public interface Node extends Iterable<Node> {
+public interface Node extends Iterable<Node>, NodeList {
+
+    @Override
+    default int getNodeCount() {
+        return getChildCount();
+    }
+
+    @Override
+    default Node getNode(int index) {
+        return getChild(index);
+    }
 
     /**
      * 节点类型

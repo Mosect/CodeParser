@@ -1,6 +1,6 @@
 package com.mosect.parser4java.core.organizer;
 
-import com.mosect.parser4java.core.Node;
+import com.mosect.parser4java.core.NodeList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,24 +8,49 @@ import java.util.List;
 public class NodeContext {
 
     private final NodeOrganizer organizer;
-    private final List<? extends Node> source;
+    private final NodeList nodeList;
+    private final int nodeStart;
+    private final int nodeEnd;
     private final List<NodeRegion> regions = new ArrayList<>(64);
     private final List<NodeRegion> unclosedRegions = new ArrayList<>(12);
 
-    public NodeContext(NodeOrganizer organizer, List<? extends Node> source) {
+    public NodeContext(NodeOrganizer organizer, NodeList nodeList, int nodeStart, int nodeEnd) {
         this.organizer = organizer;
-        this.source = source;
+        this.nodeList = nodeList;
+        this.nodeStart = nodeStart;
+        this.nodeEnd = nodeEnd;
     }
 
     public NodeOrganizer getOrganizer() {
         return organizer;
     }
 
-    public List<? extends Node> getSource() {
-        return source;
+    public NodeList getNodeList() {
+        return nodeList;
+    }
+
+    public int getNodeStart() {
+        return nodeStart;
+    }
+
+    public int getNodeEnd() {
+        return nodeEnd;
+    }
+
+    public void addRegion(NodeRegion region) {
+        region.setIndex(regions.size());
+        regions.add(region);
+        if (!region.isHeadOk() || !region.isTailOk()) {
+            region.setUnclosedIndex(unclosedRegions.size());
+            unclosedRegions.add(region);
+        }
     }
 
     public int getRegionCount() {
+        return regions.size();
+    }
+
+    public int getUnclosedRegionCount() {
         return regions.size();
     }
 
@@ -33,45 +58,19 @@ public class NodeContext {
         return regions.get(index);
     }
 
-    public int getUnclosedRegionCount() {
-        return unclosedRegions.size();
-    }
-
     public NodeRegion getUnclosedRegion(int index) {
         return unclosedRegions.get(index);
     }
 
-    void addRegion(NodeRegion region) {
-        region.setIndex(regions.size());
-        regions.add(region);
-        region.getHandler().onRegionAdded(this, region);
+    public NodeList makeNodeList() {
+        return null;
     }
 
-    void addUnclosedRegion(NodeRegion region) {
-        region.setUnclosedIndex(unclosedRegions.size());
-        unclosedRegions.add(region);
-    }
-
-    /**
-     * 关闭区域
-     *
-     * @param unclosedIndex    未关闭
-     * @param end              节点结束位置
-     * @param onClosedCallback 关闭回调
-     */
-    public void closeRegion(int unclosedIndex, int end, OnClosedCallback onClosedCallback) {
-        while (unclosedRegions.size() > unclosedIndex) {
-            NodeRegion region = unclosedRegions.remove(unclosedRegions.size() - 1);
-            region.setEnd(end);
-            region.setUnclosedIndex(-1);
-            if (null != onClosedCallback) {
-                region.getHandler().onRegionClosed(this, region);
-                onClosedCallback.onRegionClosed(region);
+    public void removeUnclosedRegion(int unclosedIndex) {
+        if (unclosedIndex >= 0 && unclosedIndex < unclosedRegions.size()) {
+            while (unclosedRegions.size() > unclosedIndex) {
+                unclosedRegions.remove(unclosedRegions.size() - 1);
             }
         }
-    }
-
-    public interface OnClosedCallback {
-        void onRegionClosed(NodeRegion region);
     }
 }
