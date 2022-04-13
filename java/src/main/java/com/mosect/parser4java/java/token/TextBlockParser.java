@@ -4,7 +4,7 @@ import com.mosect.parser4java.core.Token;
 import com.mosect.parser4java.core.common.CommonTextParser;
 import com.mosect.parser4java.core.text.CharTextParser;
 import com.mosect.parser4java.core.util.CharUtils;
-import com.mosect.parser4java.java.NameConstants;
+import com.mosect.parser4java.java.Constants;
 
 /**
  * 文本块解析器
@@ -17,7 +17,7 @@ public class TextBlockParser extends CommonTextParser {
 
     @Override
     public String getName() {
-        return NameConstants.PARSER_TEXT_BLOCK;
+        return Constants.PARSER_TEXT_BLOCK;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class TextBlockParser extends CommonTextParser {
     @Override
     public Token makeToken() {
         String text = getParseText().toString();
-        return new StringToken(NameConstants.TOKEN_TEXT_BLOCK, text, getString());
+        return new StringToken(Constants.TOKEN_TEXT_BLOCK, text, getString());
     }
 
     protected boolean isWhitespaceChar(char ch) {

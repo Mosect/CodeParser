@@ -2,9 +2,11 @@ package com.mosect.parser4java.java.node;
 
 import com.mosect.parser4java.core.common.CommonNode;
 
-public class ImportNode extends CommonNode {
-
-    public ImportNode(String type) {
+/**
+ * 圆括号节点
+ */
+public class CurvesNode extends CommonNode {
+    public CurvesNode(String type) {
         super(type);
     }
 }

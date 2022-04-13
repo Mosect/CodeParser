@@ -1,6 +1,7 @@
 package com.mosect.parser4java.core.common;
 
 import com.mosect.parser4java.core.Node;
+import com.mosect.parser4java.core.NodeList;
 import com.mosect.parser4java.core.ParseError;
 
 import java.io.IOException;
@@ -118,6 +119,14 @@ public class CommonNode implements Node {
             }
         }
         return ok;
+    }
+
+    @Override
+    public void addChildren(NodeList children) {
+        for (int i = 0; i < children.getNodeCount(); i++) {
+            Node node = children.getNode(i);
+            addChild(node);
+        }
     }
 
     @Override

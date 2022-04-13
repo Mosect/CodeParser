@@ -53,6 +53,11 @@ public interface Token extends Node {
     }
 
     @Override
+    default void addChildren(NodeList children) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     default boolean isToken() {
         return true;
     }

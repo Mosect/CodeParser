@@ -1,11 +1,13 @@
 package com.mosect.parser4java.java;
 
-import com.mosect.parser4java.core.Node;
+import com.mosect.parser4java.core.NodeList;
 import com.mosect.parser4java.core.ParseError;
 import com.mosect.parser4java.core.TextParser;
 import com.mosect.parser4java.core.TextSource;
 import com.mosect.parser4java.core.Token;
+import com.mosect.parser4java.core.util.ArrayNodeList;
 import com.mosect.parser4java.core.util.ParserSet;
+import com.mosect.parser4java.java.organizer.BracketNodeOrganizer;
 import com.mosect.parser4java.java.token.CharParser;
 import com.mosect.parser4java.java.token.CommentParser;
 import com.mosect.parser4java.java.token.NamedParser;
@@ -27,7 +29,8 @@ public class JavaParser {
     protected ParserSet parserSet2;
 
     protected final List<Token> tokenList = new ArrayList<>(512);
-    private List<Node> nodes;
+    protected BracketNodeOrganizer bracketNodeOrganizer = new BracketNodeOrganizer();
+    protected NodeList nodeList;
 
     public JavaParser() {
         // 第一层解析
@@ -55,10 +58,14 @@ public class JavaParser {
     public void parse(TextSource source, int start) {
         onClear();
         parserSet1.parse(source, start);
+
+        // 解析括号
+        bracketNodeOrganizer.organize(new ArrayNodeList(tokenList));
+        nodeList = bracketNodeOrganizer.getOrganizedNodeList();
     }
 
-    public List<Node> getNodes() {
-        return nodes;
+    public NodeList getNodeList() {
+        return nodeList;
     }
 
     protected void processParser(TextSource source, TextParser parser) {
@@ -81,7 +88,7 @@ public class JavaParser {
 
     protected void onClear() {
         tokenList.clear();
-        nodes = null;
+        nodeList = null;
     }
 
     class InternalParserSet extends ParserSet {
@@ -93,7 +100,7 @@ public class JavaParser {
 
         @Override
         protected boolean canParse(TextSource source, TextParser parser, int offset, int unknownStart) {
-            if (NameConstants.PARSER_NUMBER.equals(parser.getName())) {
+            if (Constants.PARSER_NUMBER.equals(parser.getName())) {
                 return offset == unknownStart;
             }
             return true;

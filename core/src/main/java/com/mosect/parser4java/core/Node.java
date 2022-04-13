@@ -102,6 +102,13 @@ public interface Node extends Iterable<Node>, NodeList {
     boolean addChildren(Collection<Node> children);
 
     /**
+     * 添加子节点列表
+     *
+     * @param children 子节点列表
+     */
+    void addChildren(NodeList children);
+
+    /**
      * 获取父节点
      *
      * @return 父节点

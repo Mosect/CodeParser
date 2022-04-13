@@ -1,6 +1,6 @@
 package com.mosect.parser4java.java.token;
 
-import com.mosect.parser4java.java.NameConstants;
+import com.mosect.parser4java.java.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ public class WhitespaceTokenFactory {
     }
 
     protected void register(String text, String charName) {
-        register(new WhitespaceToken(NameConstants.TOKEN_WHITESPACE, text, charName));
+        register(new WhitespaceToken(Constants.TOKEN_WHITESPACE, text, charName));
     }
 
     protected void unregister(String text) {

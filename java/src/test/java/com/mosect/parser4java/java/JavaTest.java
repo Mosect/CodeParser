@@ -36,6 +36,7 @@ public class JavaTest {
     public void testJavaParser() throws Exception {
         changeOutput();
         File file = new File("E:\\Temp\\java_src\\src\\java.base\\com\\sun\\security\\ntlm\\Client.java");
+//        File file = new File("D:\\Project\\ParserForJava\\java\\src\\test\\data\\Test.java");
         JavaParser javaParser = new JavaParser();
         parseJava(javaParser, file);
     }
@@ -76,7 +77,7 @@ public class JavaTest {
             InputStreamSource source = new InputStreamSource(fis, "UTF-8");
             javaParser.parse(source, 0);
             CommonNode node = new CommonNode("");
-            node.addChildren(javaParser.getNodes());
+            node.addChildren(javaParser.getNodeList());
             printNode(node);
         }
     }

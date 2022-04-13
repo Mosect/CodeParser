@@ -1,7 +1,7 @@
 package com.mosect.parser4java.java.token;
 
 import com.mosect.parser4java.core.Token;
-import com.mosect.parser4java.java.NameConstants;
+import com.mosect.parser4java.java.Constants;
 
 public class WhitespaceParser extends com.mosect.parser4java.javalike.WhitespaceParser {
 
@@ -9,7 +9,7 @@ public class WhitespaceParser extends com.mosect.parser4java.javalike.Whitespace
 
     @Override
     public String getName() {
-        return NameConstants.PARSER_WHITESPACE;
+        return Constants.PARSER_WHITESPACE;
     }
 
     @Override

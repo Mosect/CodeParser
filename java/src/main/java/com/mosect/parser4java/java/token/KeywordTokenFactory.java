@@ -1,6 +1,6 @@
 package com.mosect.parser4java.java.token;
 
-import com.mosect.parser4java.java.NameConstants;
+import com.mosect.parser4java.java.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -183,7 +183,7 @@ public class KeywordTokenFactory {
     }
 
     public void register(String text, KeywordToken.Data data) {
-        tokenMap.put(text, new KeywordToken(NameConstants.TOKEN_KEYWORD, text, data));
+        tokenMap.put(text, new KeywordToken(Constants.TOKEN_KEYWORD, text, data));
     }
 
     public void unregister(String text) {
