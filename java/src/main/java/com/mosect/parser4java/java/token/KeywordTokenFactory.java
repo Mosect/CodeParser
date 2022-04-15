@@ -65,6 +65,9 @@ public class KeywordTokenFactory {
         register("extends", new KeywordToken.Data()
                 .setDefinition(true)
         );
+        register("false", new KeywordToken.Data()
+                .setValue(true)
+        );
         register("final", new KeywordToken.Data()
                 .setModifyMethod(true)
                 .setModifyClass(true)
@@ -99,9 +102,6 @@ public class KeywordTokenFactory {
         register("interface", new KeywordToken.Data()
                 .setDefinition(true)
         );
-        register("@interface", new KeywordToken.Data()
-                .setDefinition(true)
-        );
         register("long", new KeywordToken.Data()
                 .setPrimitive(true)
         );
@@ -112,7 +112,7 @@ public class KeywordTokenFactory {
                 .setInstructed(true)
         );
         register("null", new KeywordToken.Data()
-                .setPrimitive(true)
+                .setValue(true)
         );
         register("package", new KeywordToken.Data()
                 .setDefinition(true)
@@ -167,6 +167,9 @@ public class KeywordTokenFactory {
         );
         register("transient", new KeywordToken.Data()
                 .setModifyField(true)
+        );
+        register("true", new KeywordToken.Data()
+                .setValue(true)
         );
         register("try", new KeywordToken.Data()
                 .setInstructed(true)

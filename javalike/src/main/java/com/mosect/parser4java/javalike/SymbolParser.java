@@ -52,8 +52,7 @@ public class SymbolParser extends CommonTextParser {
         registerSymbol("<");
         registerSymbol(">");
 
-        // @不是运算符号
-//        registerSymbol("@");
+        registerSymbol("@");
         registerSymbol(",");
         registerSymbol("?");
         registerSymbol(":");

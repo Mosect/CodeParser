@@ -45,6 +45,36 @@ public final class NodeUtils {
         return trimStart;
     }
 
+    public static int trimStartOnlyKeyword(String keyword, NodeList src, int start, int end) {
+        int trimStart = start;
+        boolean hasKeyword = false;
+        for (int i = end - 1; i >= start; i--) {
+            Node srcNode = src.getNode(i);
+            if (srcNode.isToken()) {
+                if (Constants.TOKEN_COMMENT.equals(srcNode.getType()) ||
+                        Constants.TOKEN_WHITESPACE.equals(srcNode.getType())) {
+                    trimStart = i;
+                } else if (Constants.TOKEN_KEYWORD.equals(srcNode.getType())) {
+                    Token token = (Token) srcNode;
+                    if (null == keyword || keyword.equals(token.getText())) {
+                        trimStart = i;
+                        if (!hasKeyword) hasKeyword = true;
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        if (hasKeyword) {
+            return trimStart;
+        }
+        return end - 1;
+    }
+
     public static int trimEnd(NodeList src, int start, int end) {
         int trimEnd = end;
         for (int i = end - 1; i >= start; i--) {
@@ -61,5 +91,36 @@ public final class NodeUtils {
             }
         }
         return trimEnd;
+    }
+
+    public static int beforeToken(String type, String text, NodeList src, int start, int end) {
+        return beforeToken(src, start, end, token -> {
+            if (type.equals(token.getType())) {
+                return null == text || text.equals(token.getText());
+            }
+            return false;
+        });
+    }
+
+    public static int beforeToken(NodeList src, int start, int end, TokenChecker checker) {
+        for (int i = end - 1; i >= start; i--) {
+            Node node = src.getNode(i);
+            if (node.isToken()) {
+                Token token = (Token) node;
+                if (Constants.TOKEN_COMMENT.equals(node.getType()) ||
+                        Constants.TOKEN_WHITESPACE.equals(node.getType())) {
+                    continue;
+                }
+
+                if (checker.checkToken(token)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    public interface TokenChecker {
+        boolean checkToken(Token token);
     }
 }

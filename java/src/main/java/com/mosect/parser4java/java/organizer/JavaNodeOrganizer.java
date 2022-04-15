@@ -39,6 +39,12 @@ public class JavaNodeOrganizer {
     public void organize(NodeList nodeList, int start, int end) {
         onClear();
         onOrganize(nodeList, start, end);
+        for (JavaNodeRegion region : regions) {
+            if (null == region.getNode()) {
+                Node node = createNodeWithRegion(region);
+                region.setNode(node);
+            }
+        }
         organizedNodeList = nodeListMaker.make(nodeList, regions);
     }
 
@@ -67,10 +73,24 @@ public class JavaNodeOrganizer {
                 }
             }
             if (consumed) {
-                nodeStart = offset + 1;
+                JavaNodeRegion unclosed = getLastUnclosedRegion();
+                if (unclosed.getResetOffset() >= 0) {
+                    // 此区域无效，移除
+                    unclosedRegions.remove(unclosedRegions.size() - 1);
+                    while (regions.size() > 0) {
+                        NodeRegion region = regions.remove(regions.size() - 1);
+                        if (region == unclosed) break;
+                    }
+                    // 恢复重置点
+                    offset = unclosed.getResetOffset();
+                    nodeStart = unclosed.getResetStart();
+                } else {
+                    nodeStart = offset + 1;
+                }
             } else {
                 JavaNodeRegion region = onMatchRegion(nodeList, node, nodeStart, offset);
                 if (null != region) {
+                    region.setResetStart(nodeStart);
                     // 匹配了新区域
                     addRegion(region);
                     nodeStart = region.getEnd();
@@ -185,20 +205,12 @@ public class JavaNodeOrganizer {
         unclosedRegions.clear();
     }
 
-    protected boolean isMethodEnv() {
-        NodeRegion region = getLastUnclosedRegion();
-        if (null != region) {
-
-        }
-        return false;
-    }
-
     /**
      * 获取最后一个未关闭区间
      *
      * @return 未关闭区间
      */
-    protected NodeRegion getLastUnclosedRegion() {
+    protected JavaNodeRegion getLastUnclosedRegion() {
         if (unclosedRegions.size() > 0) {
             return unclosedRegions.get(unclosedRegions.size() - 1);
         }
@@ -207,7 +219,7 @@ public class JavaNodeOrganizer {
 
     protected JavaNodeRegion createTypeNodeRegion(String classType, NodeList src, int start, int offset) {
         TypeNode node = new TypeNode(Constants.NODE_TYPE, classType);
-        int safeStart = NodeUtils.trimStart(src, start, offset);
+        int safeStart = NodeUtils.trimStartOnlyKeyword(null, src, start, offset);
         return new JavaNodeRegion(node, src, safeStart, offset + 1);
     }
 
@@ -220,5 +232,9 @@ public class JavaNodeOrganizer {
         int safeStart = NodeUtils.trimStart(src, start, offset);
         SentenceNode node = new SentenceNode(Constants.NODE_SENTENCE, Constants.SENTENCE_TYPE_UNKNOWN);
         return new JavaNodeRegion(node, src, safeStart, offset + 1);
+    }
+
+    protected Node createNodeWithRegion(JavaNodeRegion region) {
+        throw new IllegalStateException("Unsupported region state: " + region.getState());
     }
 }

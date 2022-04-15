@@ -16,13 +16,31 @@ public class Constants {
 
     // 节点类型
 
+    public final static String NODE_DOCUMENT = "java.node.document";
     public final static String NODE_SENTENCE = "java.node.sentence";
     public final static String NODE_TYPE = "java.node.type";
     public final static String NODE_METHOD = "java.node.method";
 
+    /**
+     * 括号
+     */
+    public final static String NODE_BRACKET = "java.node.bracket";
+    /**
+     * 花括号
+     */
     public final static String NODE_BRACE = "java.node.brace";
+    /**
+     * 圆括号
+     */
     public final static String NODE_CURVES = "java.node.curves";
+    /**
+     * 方括号
+     */
     public final static String NODE_SQUARE = "java.node.square";
+    /**
+     * 尖括号
+     */
+    public final static String NODE_ANGLE = "java.node.angle";
 
     // 语句类型
     /**

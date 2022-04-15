@@ -42,6 +42,10 @@ public class KeywordToken extends CommonToken {
         return data.definition;
     }
 
+    public boolean isValue() {
+        return data.value;
+    }
+
     public static class Data {
 
         private boolean modifyClass; // 是否可以修饰类
@@ -50,6 +54,7 @@ public class KeywordToken extends CommonToken {
         private boolean primitive; // 是否为原始类型
         private boolean instructed; // 是否为之类
         private boolean definition; // 是否为声明
+        private boolean value; // 是否为一个值
 
         public boolean isModifyClass() {
             return modifyClass;
@@ -102,6 +107,15 @@ public class KeywordToken extends CommonToken {
 
         public Data setDefinition(boolean definition) {
             this.definition = definition;
+            return this;
+        }
+
+        public boolean isValue() {
+            return value;
+        }
+
+        public Data setValue(boolean value) {
+            this.value = value;
             return this;
         }
     }

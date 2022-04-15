@@ -7,11 +7,14 @@ import com.mosect.parser4java.core.organizer.NodeRegion;
 public class JavaNodeRegion implements NodeRegion {
 
     private JavaNodeRegion parent;
-    private final Node node;
+    private Node node;
     private final NodeList src;
     private int start;
     private int end;
     private boolean closed;
+    private String state; // 状态
+    private int resetOffset = -1; // 重置当前位置
+    private int resetStart = -1; // 重置开始点
 
     public JavaNodeRegion(Node node, NodeList src, int start, int end) {
         this.node = node;
@@ -20,8 +23,19 @@ public class JavaNodeRegion implements NodeRegion {
         this.end = end;
     }
 
+    public JavaNodeRegion(String state, NodeList src, int start, int end) {
+        this.state = state;
+        this.src = src;
+        this.start = start;
+        this.end = end;
+    }
+
     public void setParent(JavaNodeRegion parent) {
         this.parent = parent;
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
     }
 
     @Override
@@ -62,5 +76,29 @@ public class JavaNodeRegion implements NodeRegion {
 
     public boolean isClosed() {
         return closed;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setResetOffset(int resetOffset) {
+        this.resetOffset = resetOffset;
+    }
+
+    public int getResetOffset() {
+        return resetOffset;
+    }
+
+    public void setResetStart(int resetStart) {
+        this.resetStart = resetStart;
+    }
+
+    public int getResetStart() {
+        return resetStart;
     }
 }
