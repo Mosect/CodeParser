@@ -1,13 +1,15 @@
 package com.mosect.parser4java.java;
 
-import com.mosect.parser4java.core.NodeList;
+import com.mosect.parser4java.core.Node;
 import com.mosect.parser4java.core.ParseError;
 import com.mosect.parser4java.core.TextParser;
 import com.mosect.parser4java.core.TextSource;
 import com.mosect.parser4java.core.Token;
 import com.mosect.parser4java.core.util.ArrayNodeList;
 import com.mosect.parser4java.core.util.ParserSet;
-import com.mosect.parser4java.java.organizer.BracketNodeOrganizer;
+import com.mosect.parser4java.java.node.BlockNodeParser;
+import com.mosect.parser4java.java.node.CurlyBracketNodeParser;
+import com.mosect.parser4java.java.node.CurvesBracketNodeParser;
 import com.mosect.parser4java.java.token.CharParser;
 import com.mosect.parser4java.java.token.CommentParser;
 import com.mosect.parser4java.java.token.NamedParser;
@@ -29,8 +31,9 @@ public class JavaParser {
     protected ParserSet parserSet2;
 
     protected final List<Token> tokenList = new ArrayList<>(512);
-    protected BracketNodeOrganizer bracketNodeOrganizer = new BracketNodeOrganizer();
-    protected NodeList nodeList;
+    protected CurlyBracketNodeParser curlyBracketNodeParser = new CurlyBracketNodeParser();
+    protected CurvesBracketNodeParser curvesBracketNodeParser = new CurvesBracketNodeParser();
+    protected BlockNodeParser blockNodeParser = new BlockNodeParser();
 
     public JavaParser() {
         // 第一层解析
@@ -55,17 +58,34 @@ public class JavaParser {
         parserSet1.setChildParserSet(parserSet2);
     }
 
-    public void parse(TextSource source, int start) {
+    public void parse(TextSource source, int start, Node out) {
         onClear();
         parserSet1.parse(source, start);
 
-        // 解析括号
-        bracketNodeOrganizer.organize(new ArrayNodeList(tokenList));
-        nodeList = bracketNodeOrganizer.getOrganizedNodeList();
+        // 解析花括号
+        curlyBracketNodeParser.parse(new ArrayNodeList(tokenList), 0, tokenList.size(), out);
+        // 解析圆括号
+        List<Node> nodes = new ArrayList<>();
+        findAllNodes(out, nodes);
+        ArrayNodeList srcTemp = new ArrayNodeList(64);
+        for (Node node : nodes) {
+            curvesBracketNodeParser.organize(node, srcTemp);
+        }
+        // 解析块：语句、方法、类
+        nodes.clear();
+        findAllNodes(out, nodes);
+        for (Node node : nodes) {
+            blockNodeParser.organize(node, srcTemp);
+        }
     }
 
-    public NodeList getNodeList() {
-        return nodeList;
+    protected void findAllNodes(Node src, List<Node> out) {
+        out.add(src);
+        for (Node child : src) {
+            if (child.isToken()) continue;
+            out.add(child);
+            findAllNodes(child, out);
+        }
     }
 
     protected void processParser(TextSource source, TextParser parser) {
@@ -88,7 +108,6 @@ public class JavaParser {
 
     protected void onClear() {
         tokenList.clear();
-        nodeList = null;
     }
 
     class InternalParserSet extends ParserSet {

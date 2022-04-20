@@ -75,9 +75,8 @@ public class JavaTest {
         out.println("parseJava: " + javaFile);
         try (FileInputStream fis = new FileInputStream(javaFile)) {
             InputStreamSource source = new InputStreamSource(fis, "UTF-8");
-            javaParser.parse(source, 0);
-            CommonNode node = new CommonNode("");
-            node.addChildren(javaParser.getNodeList());
+            Node node = new CommonNode("");
+            javaParser.parse(source, 0, node);
             printNode(node);
         }
     }

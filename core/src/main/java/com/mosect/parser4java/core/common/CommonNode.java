@@ -103,6 +103,9 @@ public class CommonNode implements Node {
     @Override
     public void clearAllChild() {
         if (null != children) {
+            for (Node child : children) {
+                child.setParent(null);
+            }
             children.clear();
         }
     }

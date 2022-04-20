@@ -25,6 +25,9 @@ public class Constants {
      * 括号
      */
     public final static String NODE_BRACKET = "java.node.bracket";
+    public final static String BRACKET_CURLY = "curly";
+    public final static String BRACKET_CURVES = "curves";
+
     /**
      * 花括号
      */
