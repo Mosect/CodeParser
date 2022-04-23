@@ -17,9 +17,6 @@ public class Constants {
     // 节点类型
 
     public final static String NODE_DOCUMENT = "java.node.document";
-    public final static String NODE_SENTENCE = "java.node.sentence";
-    public final static String NODE_TYPE = "java.node.type";
-    public final static String NODE_METHOD = "java.node.method";
 
     /**
      * 括号
@@ -27,123 +24,7 @@ public class Constants {
     public final static String NODE_BRACKET = "java.node.bracket";
     public final static String BRACKET_CURLY = "curly";
     public final static String BRACKET_CURVES = "curves";
-
-    /**
-     * 花括号
-     */
-    public final static String NODE_BRACE = "java.node.brace";
-    /**
-     * 圆括号
-     */
-    public final static String NODE_CURVES = "java.node.curves";
-    /**
-     * 方括号
-     */
-    public final static String NODE_SQUARE = "java.node.square";
-    /**
-     * 尖括号
-     */
-    public final static String NODE_ANGLE = "java.node.angle";
-
-    // 语句类型
-    /**
-     * 未知语句语句
-     */
-    public final static String SENTENCE_TYPE_UNKNOWN = "unknown";
-    /**
-     * import语句
-     */
-    public final static String SENTENCE_TYPE_IMPORT = "import";
-    /**
-     * package语句
-     */
-    public final static String SENTENCE_TYPE_PACKAGE = "package";
-    /**
-     * goto语句
-     */
-    public final static String SENTENCE_TYPE_GOTO = "goto";
-    /**
-     * if语句
-     */
-    public final static String SENTENCE_TYPE_IF = "if";
-    /**
-     * else语句
-     */
-    public final static String SENTENCE_TYPE_ELSE = "else";
-    /**
-     * for语句
-     */
-    public final static String SENTENCE_TYPE_FOR = "for";
-    /**
-     * switch语句
-     */
-    public final static String SENTENCE_TYPE_SWITCH = "switch";
-    /**
-     * do语句
-     */
-    public final static String SENTENCE_TYPE_DO = "do";
-    /**
-     * do语句
-     */
-    public final static String SENTENCE_TYPE_WHILE = "while";
-    /**
-     * throw语句
-     */
-    public final static String SENTENCE_TYPE_THROW = "throw";
-    /**
-     * synchronized语句
-     */
-    public final static String SENTENCE_TYPE_SYNCHRONIZED = "synchronized";
-    /**
-     * try语句
-     */
-    public final static String SENTENCE_TYPE_TRY = "try";
-    /**
-     * catch语句
-     */
-    public final static String SENTENCE_TYPE_CATCH = "catch";
-    /**
-     * finally语句
-     */
-    public final static String SENTENCE_TYPE_FINALLY = "synchronized";
-    /**
-     * assert语句
-     */
-    public final static String SENTENCE_TYPE_ASSERT = "assert";
-    /**
-     * break语句
-     */
-    public final static String SENTENCE_TYPE_BREAK = "break";
-    /**
-     * continue语句
-     */
-    public final static String SENTENCE_TYPE_CONTINUE = "continue";
-    /**
-     * case语句
-     */
-    public final static String SENTENCE_TYPE_CASE = "case";
-    /**
-     * return语句
-     */
-    public final static String SENTENCE_TYPE_RETURN = "return";
-
-    // class类型
-    /**
-     * 类
-     */
-    public final static String CLASS_TYPE_CLASS = "class";
-    /**
-     * 接口
-     */
-    public final static String CLASS_TYPE_INTERFACE = "interface";
-    /**
-     * 注解
-     */
-    public final static String CLASS_TYPE_ANNOTATION = "annotation";
-    /**
-     * 枚举
-     */
-    public final static String CLASS_TYPE_ENUM = "enum";
+    public final static String BRACKET_SQUARE = "square";
 
     // 文本解析器
 

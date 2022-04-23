@@ -1,8 +1,8 @@
 apply from: rootProject.file('jar.gradle')
 
 dependencies {
-    implementation project(':core')
-    implementation project(':javalike')
+    compileOnly project(':core')
+    compileOnly project(':javalike')
     testImplementation 'junit:junit:4.+'
 }
 

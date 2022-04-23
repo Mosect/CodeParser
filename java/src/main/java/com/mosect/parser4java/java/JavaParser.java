@@ -7,9 +7,7 @@ import com.mosect.parser4java.core.TextSource;
 import com.mosect.parser4java.core.Token;
 import com.mosect.parser4java.core.util.ArrayNodeList;
 import com.mosect.parser4java.core.util.ParserSet;
-import com.mosect.parser4java.java.node.BlockNodeParser;
-import com.mosect.parser4java.java.node.CurlyBracketNodeParser;
-import com.mosect.parser4java.java.node.CurvesBracketNodeParser;
+import com.mosect.parser4java.java.node.BracketNodeParser;
 import com.mosect.parser4java.java.token.CharParser;
 import com.mosect.parser4java.java.token.CommentParser;
 import com.mosect.parser4java.java.token.NamedParser;
@@ -31,9 +29,7 @@ public class JavaParser {
     protected ParserSet parserSet2;
 
     protected final List<Token> tokenList = new ArrayList<>(512);
-    protected CurlyBracketNodeParser curlyBracketNodeParser = new CurlyBracketNodeParser();
-    protected CurvesBracketNodeParser curvesBracketNodeParser = new CurvesBracketNodeParser();
-    protected BlockNodeParser blockNodeParser = new BlockNodeParser();
+    protected BracketNodeParser bracketNodeParser = new BracketNodeParser();
 
     public JavaParser() {
         // 第一层解析
@@ -62,30 +58,8 @@ public class JavaParser {
         onClear();
         parserSet1.parse(source, start);
 
-        // 解析花括号
-        curlyBracketNodeParser.parse(new ArrayNodeList(tokenList), 0, tokenList.size(), out);
-        // 解析圆括号
-        List<Node> nodes = new ArrayList<>();
-        findAllNodes(out, nodes);
-        ArrayNodeList srcTemp = new ArrayNodeList(64);
-        for (Node node : nodes) {
-            curvesBracketNodeParser.organize(node, srcTemp);
-        }
-        // 解析块：语句、方法、类
-        nodes.clear();
-        findAllNodes(out, nodes);
-        for (Node node : nodes) {
-            blockNodeParser.organize(node, srcTemp);
-        }
-    }
-
-    protected void findAllNodes(Node src, List<Node> out) {
-        out.add(src);
-        for (Node child : src) {
-            if (child.isToken()) continue;
-            out.add(child);
-            findAllNodes(child, out);
-        }
+        // 解析括号
+        bracketNodeParser.parse(new ArrayNodeList(tokenList), 0, tokenList.size(), out);
     }
 
     protected void processParser(TextSource source, TextParser parser) {
