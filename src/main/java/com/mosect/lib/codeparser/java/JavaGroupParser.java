@@ -65,6 +65,8 @@ public class JavaGroupParser {
                     return "{}";
                 case "(":
                     return "()";
+                case "[":
+                    return "[]";
                 default:
                     return null;
             }
@@ -76,6 +78,9 @@ public class JavaGroupParser {
         if (node.isToken() && "symbol".equals(node.getType())) {
             String text = ((Token) node).getText();
             if ("()".equals(group.getType()) && ")".equals(text)) {
+                return true;
+            }
+            if ("[]".equals(group.getType()) && "]".equals(text)) {
                 return true;
             }
             if ("{}".equals(group.getType()) && "}".equals(text)) {
