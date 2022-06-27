@@ -76,4 +76,13 @@ public class Group implements Node {
         }
         return group;
     }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "type='" + type + '\'' +
+                ", children.size=" + getChildCount() +
+                ", error=" + error +
+                '}';
+    }
 }

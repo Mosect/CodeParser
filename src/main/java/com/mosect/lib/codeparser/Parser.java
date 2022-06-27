@@ -40,10 +40,6 @@ public class Parser {
         while (offset < end) {
             boolean ok = false;
             for (NodeParser np : getNodeParsers()) {
-//                System.out.println(offset + "  " + np.getClass());
-                /*if (offset == 2716) {
-                    System.out.println(offset + "  " + np.getClass());
-                }*/
                 if (np.parse(text, start, offset, end, out)) {
                     ok = true;
                     break;
